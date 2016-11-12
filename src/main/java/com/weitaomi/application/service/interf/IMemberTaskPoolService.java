@@ -12,18 +12,6 @@ import com.weitaomi.systemconfig.util.Page;
  */
 public interface IMemberTaskPoolService {
     /**
-     * 发布求粉任务
-     * @param taskPool
-     * @return
-     */
-    public String uploadAddTaskPool(TaskPool taskPool);
-    /**
-     * 发布阅读任务
-     * @param publishReadRequestDto
-     * @return
-     */
-    public String uploadReadTaskPool(PublishReadRequestDto publishReadRequestDto);
-    /**
      * 获取求粉页相关信息
      * @param memberId
      * @return

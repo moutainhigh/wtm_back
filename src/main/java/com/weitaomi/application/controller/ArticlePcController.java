@@ -38,16 +38,4 @@ public class ArticlePcController extends BaseController {
         }
         return AjaxResult.getOK(articleService.getAllArticle(memberId,articleSearch,flag));
     }
-    /**
-     * 阅读文章
-     * @throws ParseException    the parse exception
-     * @see
-     */
-    @ResponseBody
-    @RequestMapping(value = "/pcreadArticleRequest", method = RequestMethod.POST)
-    public AjaxResult getArticleList(HttpServletRequest request,@RequestParam(required = false) Long time, Long articleId){
-        long memberId=this.getUserId(request);
-        return AjaxResult.getOK(articleService.pcreadArticleRequest(memberId,articleId));
-    }
-
 }

@@ -165,6 +165,7 @@ public class MemberScoreService implements IMemberScoreService {
             }
         }
     }
+
     @Override
     public Integer updateExtraRewardTimer(){
         String tableName="member:extra:reward";
@@ -230,43 +231,5 @@ public class MemberScoreService implements IMemberScoreService {
         }
         cacheService.delKeyFromRedis(tableName);
         return rewardCountDtoList.size();
-    }
-
-    @Override
-    public List<MemberScoreFlow> getMemberScoreFlowList(Long memberId) {
-        return memberScoreFlowMapper.getMemberScoreFlowListByMemberId(memberId);
-    }
-
-    @Override
-    @Transactional
-    public MemberScore getMemberScoreById(Long memberId,String phoneType) {
-        MemberScore memberScore = memberScoreMapper.getMemberScoreByMemberId(memberId);
-        logger.info("刷新钱包，信息：{}", JSON.toJSONString(memberScore));
-        if (memberScore!=null) {
-            Double value = memberScoreMapper.getOneAvaliableMemberScore(memberId, DateUtils.getUnixTimestamp(DateUtils.date2Str(new Date(), DateUtils.yyyyMMdd), DateUtils.yyyyMMdd) - 7 * 24 * 60 * 60);
-            Double avaliableScore = memberScore.getMemberScore().add(BigDecimal.valueOf(value)).doubleValue();
-            if (avaliableScore <= 0) {
-                avaliableScore = 0D;
-            }
-            memberScoreMapper.updateOneAvaliableMemberScore(avaliableScore, memberId);
-        }
-        memberMapper.updateMemberPhoneType(memberId,phoneType);
-        return memberScore;
-    }
-
-    @Override
-    public Map getAvaliableScoreAndWxInfo(long memberId) {
-        Map map=memberScoreMapper.getAvaliableScoreAndWxInfo(memberId);
-        if (StringUtil.isEmpty((String)map.get("nickname"))){
-            throw new InfoException("未获取到微信信息，请绑定微信或者联系客服人员");
-        }
-        return map;
-    }
-
-    @Override
-    public Integer updateAvaliableScore(){
-        List<Long> memberIdList=memberMapper.getAllMemberId();
-        Integer number=memberScoreMapper.getAvaliableMemberScore(memberIdList,DateUtils.getUnixTimestamp(DateUtils.date2Str(new Date(),DateUtils.yyyyMMdd),DateUtils.yyyyMMdd)-7*24*60*60);
-        return number;
     }
 }

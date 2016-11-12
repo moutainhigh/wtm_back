@@ -21,29 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 public class MemberTaskHistoryPCController extends BaseController{
     @Autowired
     private IMemberTaskHistoryService memberTaskHistoryService;
-
-    /**
-     * 获取用户每日任务
-     * @param httpServletRequest
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping(value = "/getMemberDailyTask",method = RequestMethod.POST)
-    public AjaxResult getMemberDailyTask(HttpServletRequest httpServletRequest){
-        Long memberId=super.getUserId(httpServletRequest);
-        return AjaxResult.getOK(memberTaskHistoryService.getMemberDailyTask(memberId));
-    }
-    /**
-     * 是否公众号签到
-     * @param httpServletRequest
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping(value = "/isSignAccount",method = RequestMethod.POST)
-    public AjaxResult isSignAccount(HttpServletRequest httpServletRequest){
-        Long memberId=super.getUserId(httpServletRequest);
-        return AjaxResult.getOK(memberTaskHistoryService.isSignAccount(memberId));
-    }
     /**
      * 获取用户任务记录
      * @param httpServletRequest
@@ -54,29 +31,5 @@ public class MemberTaskHistoryPCController extends BaseController{
     public AjaxResult getMemberTaskInfo(HttpServletRequest httpServletRequest, Integer type, @RequestParam(defaultValue ="10") Integer pageSize, Integer pageIndex){
         Long memberId=super.getUserId(httpServletRequest);
         return AjaxResult.getOK(memberTaskHistoryService.getMemberTaskInfo(memberId,type,pageSize,pageIndex));
-    }
-    /**
-     * 获取用户任务记录详情
-     * @param
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping(value = "/getMemberTaskInfoDetail")
-    public AjaxResult getMemberTaskInfoDetail(Long taskHistoryId){
-        return AjaxResult.getOK(memberTaskHistoryService.getMemberTaskInfoDetail(taskHistoryId));
-    }
-    /**
-     * 用户每日任务提交
-     * @param
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping(value = "/addDailyTask")
-    public AjaxResult addDailyTask(HttpServletRequest request, @RequestParam Long taskId){
-        Long memberId=this.getUserId(request);
-        if (memberId==null){
-            throw new BusinessException("用户ID为空");
-        }
-        return AjaxResult.getOK(memberTaskHistoryService.addDailyTask(memberId,taskId));
     }
 }

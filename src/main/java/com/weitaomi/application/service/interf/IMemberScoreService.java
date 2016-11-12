@@ -27,30 +27,4 @@ public interface IMemberScoreService {
      */
     Integer updateExtraRewardTimer();
 
-    /**
-     * 获取积分历史
-     * @param memberId
-     * @return
-     */
-    public List<MemberScoreFlow> getMemberScoreFlowList(Long memberId);
-
-    /**
-     * 更新最新积分信息
-     * @param memberId
-     * @return
-     */
-    public MemberScore getMemberScoreById(Long memberId,String phoneType);
-
-    /**
-     * 获取用户可用余额和公众号信息
-     * @param memberId
-     * @return
-     */
-    Map getAvaliableScoreAndWxInfo(long memberId);
-
-    /**
-     * 定时任务，更新用户可用米币数
-     * @return
-     */
-    Integer updateAvaliableScore();
 }

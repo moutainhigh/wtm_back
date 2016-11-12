@@ -29,64 +29,6 @@ public class OfficialAccountsPCController extends BaseController{
     private ThirdLoginMapper thirdLoginMapper;
 
     /**
-     * 获取用户可关注公众号列表
-     * @param httpServletRequest
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping(value = "/getFollowOfficialAccountList",method = RequestMethod.POST)
-    public AjaxResult getFollowOfficialAccountList(HttpServletRequest httpServletRequest, String unionId){
-        Long memberId=super.getUserId(httpServletRequest);
-        return AjaxResult.getOK(officeAccountService.getOfficialAccountMsg(memberId,unionId,1));
-    }
-
-    /**
-     * 完成关注
-     * @param
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping(value = "/pushAddFinished",method = RequestMethod.POST)
-    public AjaxResult pushAddFinished(@RequestBody Map<String,String> params){
-        return AjaxResult.getOK(officeAccountService.pushAddFinished(params));
-    }
-    /**
-     * 标记即将关注该公众号
-     * @param
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping(value = "/markAddRecord",method = RequestMethod.POST)
-    public AjaxResult markAddRecord(@RequestBody OfficialAccountMsg officialAccountMsg,HttpServletRequest request){
-        Long memberId=this.getUserId(request);
-        return AjaxResult.getOK(officeAccountService.markAddRecord(memberId,officialAccountMsg));
-    }
-
-    /**
-     * 查看已关注公众号
-     * @param
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping(value = "/getOfficialAccountMsgList")
-    public AjaxResult getOfficialAccountMsgList(HttpServletRequest request){
-        Long memberId=super.getUserId(request);
-        return AjaxResult.getOK(officeAccountService.getOfficialAccountMsgList(memberId,1));
-    }
-
-    /**
-     * 更新已关注公众号
-     * @param
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping(value = "/signOfficialAccountMsgList",method = RequestMethod.POST)
-    public AjaxResult signOfficialAccountMsgList(HttpServletRequest request){
-        Long memberId=super.getUserId(request);
-        return AjaxResult.getOK(officeAccountService.signOfficialAccountMsgList(memberId,1));
-    }
-
-    /**
      * 获取公众号列表
      * @param
      * @return

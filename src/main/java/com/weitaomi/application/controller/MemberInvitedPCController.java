@@ -23,7 +23,7 @@ import java.text.ParseException;
 @Controller
 @RequestMapping("/pc/admin/memberInvited")
 public class MemberInvitedPCController extends BaseController {
-    private static Logger logger= LoggerFactory.getLogger(MemberController.class);
+    private static Logger logger= LoggerFactory.getLogger(MemberInvitedPCController.class);
     @Autowired
     private IMemberInvitedRecordService memberInvitedRecordService;
 

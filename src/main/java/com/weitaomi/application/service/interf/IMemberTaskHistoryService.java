@@ -23,21 +23,6 @@ public interface IMemberTaskHistoryService {
      */
     public Page<MemberTaskWithDetail> getMemberTaskInfo(Long memberId, Integer type, Integer pageSize, Integer pageIndex);
 
-    /**
-     * 任务ID
-     * @param taskHistoryId
-     * @return
-     */
-    public List<MemberTaskHistoryDetail> getMemberTaskInfoDetail(Long taskHistoryId);
-
-    /**
-     * 获取每日奖励任务
-     * @param memberId
-     * @return
-     */
-    public List<MemberTaskDto> getMemberDailyTask(Long memberId);
-
-    Boolean isSignAccount(Long memberId);
 
     /**
      * 增加任务记录
@@ -45,13 +30,6 @@ public interface IMemberTaskHistoryService {
      * @return
      */
     public boolean addMemberTaskToHistory(Long memberId, Long taskId, Double score, Integer flag,String detail,List<MemberTaskHistoryDetail> detailList,String taskFlag);
-    /**
-     * 增加任务记录
-     * @param
-     * @return
-     */
-    public boolean updateMemberTaskToHistory(Long memberTaskId);
-
     /**
      * 每日任务记录
      * @param memberId
@@ -67,5 +45,4 @@ public interface IMemberTaskHistoryService {
 
     void threeOclockScheduledJob();
 
-    String signAccounts(Map map);
 }

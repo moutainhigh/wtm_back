@@ -60,75 +60,6 @@ public class MemberTaskHistoryService  implements IMemberTaskHistoryService {
         PageInfo<MemberTaskWithDetail> showDtoPage=new PageInfo<MemberTaskWithDetail>(memberTaskHistoryDtoList);
         return Page.trans(showDtoPage);
     }
-
-    @Override
-    public List<MemberTaskHistoryDetail> getMemberTaskInfoDetail(Long taskHistoryId) {
-
-        List<MemberTaskHistoryDetail> memberTaskHistoryDetails=memberTaskHistoryDetailMapper.getMemberTaskHistoryDetialList(taskHistoryId);
-        if (memberTaskHistoryDetails.isEmpty()){
-            return null;
-        }
-        return memberTaskHistoryDetails;
-    }
-
-    @Override
-    public List<MemberTaskDto> getMemberDailyTask(Long memberId) {
-        List<MemberTask> finishedMemberTasks=memberTaskMapper.getMemberTaskFinished(memberId,DateUtils.getTodayZeroSeconds(),DateUtils.getTodayEndSeconds());
-        List<MemberTask> memberTaskList=memberTaskMapper.getAllMemberTask();
-        if (memberTaskList.isEmpty()){
-            return null;
-        }
-        List<MemberTaskDto> memberTaskDtos=new ArrayList<MemberTaskDto>();
-        if (finishedMemberTasks.isEmpty()){
-            for (MemberTask memberTask:memberTaskList){
-                MemberTaskDto memberTaskDto=new MemberTaskDto();
-                memberTaskDto.setMemberTask(memberTask);
-                memberTaskDto.setIsFinisherToday(0);
-                memberTaskDtos.add(memberTaskDto);
-            }
-            return memberTaskDtos;
-        }
-        for (MemberTask memberTask:memberTaskList){
-            Long taskId=memberTask.getId();
-            boolean flag=false;
-            for (MemberTask memberTask1:finishedMemberTasks){
-                if (memberTask1.getId()==taskId){
-                    flag=true;
-                }
-            }
-            MemberTaskDto memberTaskDto=new MemberTaskDto();
-            memberTaskDto.setMemberTask(memberTask);
-            if (flag){
-                memberTaskDto.setIsFinisherToday(1);
-            } else{
-                memberTaskDto.setIsFinisherToday(0);
-            }
-            memberTaskDtos.add(memberTaskDto);
-        }
-        return memberTaskDtos;
-    }
-
-    @Override
-    public Boolean isSignAccount(Long memberId){
-        Integer number=cacheService.getCacheByKey("member:account:sign:"+memberId,Integer.class);
-        if (number!=null&&number==1){
-            return true;
-        }
-        List<Map<String,Long>> idMap= memberMapper.getIsFollowWtmAccount(memberId,0);
-        if (!idMap.isEmpty()){
-            if (idMap.get(0).get("officialMemberId")==null){
-                throw new InfoException("亲，您没有关注微淘米公众号哟~，请打开微信搜索‘微淘米APP’关注并置顶。点击右下方‘签到’就可以赚钱了~");
-            }
-            MemberTask memberTask=memberTaskMapper.isSignAccount(memberId,DateUtils.getTodayZeroSeconds(),DateUtils.getTodayEndSeconds());
-            if (memberTask!=null){
-                return true;
-            }else {
-                return false;
-            }
-        }else {
-            throw new InfoException("亲，您没有关注微淘米公众号哟~，请打开微信搜索‘微淘米APP’关注并置顶。点击右下方‘签到’就可以赚钱了~");
-        }
-    }
     @Override
     public boolean addMemberTaskToHistory(Long memberId, Long taskId, Double score, Integer flag,String detail,List<MemberTaskHistoryDetail> detailList,String taskFlag) {
         MemberTask memberTask = memberTaskMapper.selectByPrimaryKey(taskId);
@@ -171,11 +102,6 @@ public class MemberTaskHistoryService  implements IMemberTaskHistoryService {
     }
 
     @Override
-    public boolean updateMemberTaskToHistory(Long memberTaskId) {
-        return false;
-    }
-
-    @Override
     @Transactional
     public MemberScore addDailyTask(Long memberId, Long typeId) {
         List<MemberTaskHistory> memberTaskHistoryList=memberTaskMapper.getIsMemberTaskFinished(memberId,typeId,DateUtils.getTodayZeroSeconds(),DateUtils.getTodayEndSeconds());
@@ -203,60 +129,9 @@ public class MemberTaskHistoryService  implements IMemberTaskHistoryService {
     }
     @Override
     public void threeOclockScheduledJob() {
-        //任务一  更新用户可用米币
-        Integer number = memberScoreService.updateAvaliableScore();
-        logger.info("更新积分"+number+"条");
 
         //统一处理平台的加成奖励
-        number=memberScoreService.updateExtraRewardTimer();
+        Integer number=memberScoreService.updateExtraRewardTimer();
         logger.info("处理上下级米币问题"+number+"条");
-    }
-
-    @Override
-    public String signAccounts(Map map){
-        logger.info("用户签到信息为:{}", JSON.toJSONString(map));
-        String openId = (String) map.get("openid");
-        String nickName= Base64.decodeToString((String) map.get("nickname"));
-        Long time=DateUtils.getTodayEndSeconds()-DateUtils.getUnixTimestamp();
-        Integer number=cacheService.getCacheByKey(openId+":"+nickName,Integer.class);
-        if (number!=null&&number==1){
-            throw new InfoException("该任务今天已完成");
-        }
-        String sexTemp=map.get("sex").toString();
-        Integer sex=-1;
-        if (!StringUtil.isEmpty(sexTemp)) {
-            sex= Integer.valueOf(sexTemp);
-        }
-        Long start=System.currentTimeMillis();
-        if (StringUtil.isEmpty(openId)){
-            throw new BusinessException("获取用户信息失败");
-        }
-        logger.info("公众号签到，用户openId为:"+openId);
-        List<Long> memberId=wtmOfficialMemberMapper.getMemberIdByOpenId(openId);
-        if (memberId.isEmpty()||memberId.get(0)==null){
-            return "没有微淘米账号,请下载微淘米APP注册";
-        }
-        MemberScore memberScore = this.addDailyTask(memberId.get(0),10L);
-        logger.info("请求时间为:"+(System.currentTimeMillis()-start));
-        if (memberScore!=null){
-            List<ThirdLogin> thirdLoginList = thirdLoginMapper.getThirdLoginByMemberId(memberId.get(0));
-            Member member=memberMapper.selectByPrimaryKey(memberId.get(0));
-            for (ThirdLogin thirdLogin:thirdLoginList){
-                if (thirdLogin.getNickname()!=nickName){
-                    thirdLogin.setNickname(nickName);
-                    thirdLoginMapper.updateByPrimaryKeySelective(thirdLogin);
-                }
-                if (sex!=-1&&member.getSex()!=sex){
-                    member.setSex(sex);
-                    memberMapper.updateByPrimaryKeySelective(member);
-                }
-            }
-            logger.info("签到成功，用户ID为{}",memberId.get(0));
-            cacheService.setCacheByKey(openId + ":" + nickName, 1, time.intValue());
-            cacheService.setCacheByKey("member:account:sign:"+memberId.get(0), 1, time.intValue());
-            return "签到成功，现在您可以返回APP领取任务";
-        }
-        logger.info("签到失败，用户ID为{}",memberId.get(0));
-        return "签到失败，请稍后再试...";
     }
 }
