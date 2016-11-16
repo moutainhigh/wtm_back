@@ -27,4 +27,5 @@ public interface IMemberScoreService {
      */
     Integer updateExtraRewardTimer();
 
+    Integer addOfficialAccountScoreToAvaliable();
 }

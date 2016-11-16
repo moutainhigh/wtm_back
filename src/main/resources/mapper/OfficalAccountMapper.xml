@@ -73,10 +73,14 @@
 
 <select id="getOfficialAccountWithScoreById"
     resultType="com.weitaomi.application.model.dto.OfficialAccountWithScore">
- select account.*,pool.singleScore score from wtm_official_accounts account
-  LEFT JOIN wtm_official_accounts_level le ON account.level=le.id
-  LEFT JOIN wtm_task_pool pool ON pool.officialAccountsId=account.id
-  WHERE account.originId=#{originId} AND pool.isPublishNow=1
+    select account.*,pool.singleScore score from wtm_official_accounts account
+    LEFT JOIN wtm_official_accounts_level le ON account.level=le.id
+    LEFT JOIN wtm_task_pool pool ON pool.officialAccountsId=account.id
+    WHERE account.originId=#{originId}
+    <if test="flag!=0">
+        AND pool.isPublishNow=#{flag}
+    </if>
+    limit 1;
 </select>
 <select id="getOfficialAccountList" resultType="com.weitaomi.application.model.bean.OfficialAccount">
     select * from wtm_official_accounts a WHERE a.memberId=#{memberId}

@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
-  <artifact type="exploded-war" name="weitaomiProject:war exploded">
-    <output-path>$PROJECT_DIR$/target/weitaomiProject-1.0</output-path>
+  <artifact type="exploded-war" name="wtm_back:war exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/wtm_back_war_exploded</output-path>
     <root id="root">
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
@@ -17,6 +17,8 @@
           <element id="library" level="project" name="Maven: org.aspectj:aspectjrt:1.6.9" />
           <element id="library" level="project" name="Maven: org.aspectj:aspectjweaver:1.6.9" />
           <element id="library" level="project" name="Maven: com.alibaba:druid:1.0.16" />
+          <element id="library" level="module" name="Maven: com.alibaba:jconsole:1.8.0" module-name="weitaomiProject" />
+          <element id="library" level="module" name="Maven: com.alibaba:tools:1.8.0" module-name="weitaomiProject" />
           <element id="library" level="project" name="Maven: org.mybatis:mybatis:3.2.8" />
           <element id="library" level="project" name="Maven: org.mybatis:mybatis-spring:1.2.0" />
           <element id="library" level="project" name="Maven: com.github.abel533:mapper:2.3.2" />
@@ -24,8 +26,6 @@
           <element id="library" level="project" name="Maven: commons-beanutils:commons-beanutils:1.9.2" />
           <element id="library" level="project" name="Maven: com.github.pagehelper:pagehelper:3.6.3" />
           <element id="library" level="project" name="Maven: com.github.jsqlparser:jsqlparser:0.9.1" />
-          <element id="library" level="project" name="Maven: javax.servlet:servlet-api:2.5" />
-          <element id="library" level="project" name="Maven: javax.servlet:javax.servlet-api:3.0.1" />
           <element id="library" level="project" name="Maven: taglibs:standard:1.1.2" />
           <element id="library" level="project" name="Maven: javax.servlet:jstl:1.2" />
           <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.6.5" />
@@ -102,9 +102,6 @@
           <element id="library" level="project" name="Maven: org.objenesis:objenesis:2.1" />
           <element id="library" level="project" name="Maven: org.jsoup:jsoup:1.10.1" />
         </element>
-      </element>
-      <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/target/weitaomiProject-1.0/META-INF/MANIFEST.MF" />
       </element>
       <element id="javaee-facet-resources" facet="weitaomiProject/web/Web" />
     </root>

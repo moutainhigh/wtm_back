@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.weitaomi.application.model.mapper.TaskFailPushToWechatMapper" >
+  <resultMap id="BaseResultMap" type="com.weitaomi.application.model.bean.TaskFailPushToWechat" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="isPushToWechat" property="isPushToWechat" jdbcType="INTEGER" />
+    <result column="params" property="params" jdbcType="VARCHAR" />
+    <result column="postUrl" property="postUrl" jdbcType="VARCHAR" />
+    <result column="createTime" property="createTime" jdbcType="BIGINT" />
+  </resultMap>
+  <select id="getAllTaskFailPushToWechat"
+          resultType="com.weitaomi.application.model.bean.TaskFailPushToWechat">
+    select * from wtm_task_fail_pushToWechat wechat WHERE wechat.isPushToWechat=0 AND wechat.type IN
+    <foreach collection="idList" item="id" open="(" close=")" index="index" separator=",">
+      #{id}
+    </foreach>
+  </select>
+</mapper>

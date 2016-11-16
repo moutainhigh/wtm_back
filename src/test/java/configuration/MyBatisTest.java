@@ -10,6 +10,7 @@ import com.weitaomi.application.model.bean.ThirdLogin;
 import com.weitaomi.application.model.mapper.*;
 import com.weitaomi.application.service.interf.IMemberScoreService;
 import com.weitaomi.application.service.interf.IMemberTaskHistoryService;
+import com.weitaomi.application.service.interf.IOfficeAccountService;
 import com.weitaomi.application.service.interf.IPaymentService;
 import com.weitaomi.systemconfig.util.*;
 import com.weitaomi.systemconfig.wechat.WechatConfig;
@@ -44,13 +45,13 @@ public class MyBatisTest extends BaseContextCase {
     @Autowired
     private IPaymentService paymentService;
     @Autowired
-    private IMemberTaskHistoryService memberTaskHistoryService;
+    private IOfficeAccountService officeAccountService;
     @Autowired
     private MemberScoreFlowMapper memberScoreFlowMapper;
     @Autowired
     private IMemberScoreService memberScoreService;
-    //    @Autowired
-//    IMemberTaskHistoryService memberTaskHistoryService;
+        @Autowired
+    IMemberTaskHistoryService memberTaskHistoryService;
     @Test
     public void testAddMember() {
         Member member = new Member();
@@ -224,8 +225,7 @@ public class MyBatisTest extends BaseContextCase {
     }
     @Test
     public void testMemberScoreMapper(){
-        Double value=memberScoreFlowMapper.getToalFlowScore(7L);
-        System.out.println(value);
+        memberTaskHistoryService.deleteUnFinishedTask();
     }
 }
 

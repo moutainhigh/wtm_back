@@ -4,6 +4,7 @@ import com.weitaomi.application.model.BaseModel;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 @Table(name = "wtm_office_member")
 public class OfficeMember extends BaseModel implements Serializable{
@@ -30,7 +31,16 @@ public class OfficeMember extends BaseModel implements Serializable{
      */
     @Column(name = "openId")
     private String openId;
-
+    /**
+     * 是否已经奖励
+     */
+    @Column(name = "isScoreAccess")
+    private Integer isScoreAccess;
+    /**
+     *  关注奖励
+     */
+    @Column(name = "addRewarScore")
+    private BigDecimal addRewarScore;
     /**
      * 完成时间
      */
@@ -162,5 +172,37 @@ public class OfficeMember extends BaseModel implements Serializable{
      */
     public void setOpenId(String openId) {
         this.openId = openId;
+    }
+
+    /**
+     * 获取是否已经奖励
+     * @return isScoreAccess 是否已经奖励
+     */
+    public Integer getIsScoreAccess() {
+        return this.isScoreAccess;
+    }
+
+    /**
+     * 设置是否已经奖励
+     * @param isScoreAccess 是否已经奖励
+     */
+    public void setIsScoreAccess(Integer isScoreAccess) {
+        this.isScoreAccess = isScoreAccess;
+    }
+
+    /**
+     * 获取 关注奖励
+     * @return addRewarScore  关注奖励
+     */
+    public BigDecimal getAddRewarScore() {
+        return this.addRewarScore;
+    }
+
+    /**
+     * 设置 关注奖励
+     * @param addRewarScore  关注奖励
+     */
+    public void setAddRewarScore(BigDecimal addRewarScore) {
+        this.addRewarScore = addRewarScore;
     }
 }

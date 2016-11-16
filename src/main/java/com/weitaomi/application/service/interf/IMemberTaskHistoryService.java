@@ -30,13 +30,6 @@ public interface IMemberTaskHistoryService {
      * @return
      */
     public boolean addMemberTaskToHistory(Long memberId, Long taskId, Double score, Integer flag,String detail,List<MemberTaskHistoryDetail> detailList,String taskFlag);
-    /**
-     * 每日任务记录
-     * @param memberId
-     * @param typeId
-     * @return
-     */
-    MemberScore addDailyTask(Long memberId, Long typeId);
 
     /**
      * 定时清除未完成的任务
@@ -45,4 +38,5 @@ public interface IMemberTaskHistoryService {
 
     void threeOclockScheduledJob();
 
+    void twoOclockScheduledJob();
 }

@@ -9,6 +9,8 @@
     <result column="officeAccountId" property="officeAccountId" jdbcType="BIGINT" />
     <result column="memberId" property="memberId" jdbcType="BIGINT" />
     <result column="isAccessNow" property="isAccessNow" jdbcType="INTEGER" />
+    <result column="isScoreAccess" property="isScoreAccess" jdbcType="INTEGER" />
+    <result column="addRewarScore" property="addRewarScore" jdbcType="DECIMAL" />
     <result column="openId" property="openId" jdbcType="VARCHAR" />
     <result column="finishedTime" property="finishedTime" jdbcType="BIGINT" />
     <result column="createTime" property="createTime" jdbcType="BIGINT" />
@@ -21,6 +23,12 @@
   </insert>
   <update id="updateOfficialMemberList">
     update wtm_office_member  set isAccessNow  = 1 where isAccessNow=0 AND memberId=#{memberId} AND unix_timestamp(now())-createTime &lt; 60*60;
+  </update>
+  <update id="updateOfficialMemberForAvaliable">
+    update wtm_office_member set isScoreAccess = 1 where id IN
+    <foreach collection="idList" item="id" close=")" open="(" index="index" separator=",">
+      #{id}
+    </foreach>
   </update>
   <delete id="deleteOverTimeUnfollowedAccounts">
     DELETE FROM wtm_office_member WHERE isAccessNow=0 AND finishedTime is NULL AND unix_timestamp(now())-createTime>#{time}
@@ -42,5 +50,15 @@
     LEFT JOIN wtm_official_accounts a ON a.id=m.officeAccountId LEFT JOIN wtm_member member ON member.id=m.memberId
     LEFT JOIN wtm_third_login login ON member.id=login.memberId
      WHERE m.memberId=#{memberId} AND m.isAccessNow=0 AND login.sourceType=#{sourceType}
+  </select>
+  <select id="getOfficialAddAvaliableScoreList"
+          resultType="com.weitaomi.application.model.dto.OfficialAddAvaliableScore">
+    select id id,memberId memberId,addRewarScore score from wtm_office_member WHERE unix_timestamp(now())-finishedTime>limitTime AND isAccessNow=1 AND isScoreAccess=0
+  </select>
+  <select id="getOfficeMemberUnfinishedList" resultType="com.weitaomi.application.model.bean.OfficeMember">
+    SELECT * FROM wtm_office_member WHERE isAccessNow=0 AND finishedTime is NULL AND unix_timestamp(now())-createTime>#{time}
+  </select>
+  <select id="getCacheKeyParams" resultType="java.util.Map">
+    select m.sex,login.nickname from wtm_member m LEFT JOIN wtm_third_login login ON login.memberId=m.id WHERE m.id=#{memberId}  limit 1
   </select>
 </mapper>

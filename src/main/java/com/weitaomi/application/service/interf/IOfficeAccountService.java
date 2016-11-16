@@ -20,6 +20,10 @@ public interface IOfficeAccountService {
      */
     public Boolean pushAddFinished(Map<String,String> params);
 
+    void taskFailPushToWechat();
+
+    void taskFailToAckAddRequest();
+
     /**
      * 获取商户公众号列表
      * @param memberId
