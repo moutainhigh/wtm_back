@@ -151,7 +151,7 @@ public class MemberScoreService implements IMemberScoreService {
                 if (!flag) {
                     throw new BusinessException("积分记录失败");
                 }
-                cacheService.setCacheByKey(key, memberScore, SystemConfig.TASK_CACHE_TIME);
+                cacheService.setCacheByKey(key, memberScore, 60);
                 String table="member:score:type:isAvaliableToSuper";
                 if (cacheService.keyExistInHashTable(table,typeId.toString())&&increaseScore.doubleValue()>0) {
                     //处理上级奖励问题
