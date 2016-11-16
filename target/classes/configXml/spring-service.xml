@@ -22,6 +22,7 @@
             <list>
                 <ref bean="testTrigger" />
                 <ref bean="updateScoreTrigger" />
+                <ref bean="twoOclockTrigger" />
             </list>
         </property>
         <property name="autoStartup" value="true"/>
@@ -32,7 +33,17 @@
     </bean>
     <bean id="updateScoreTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="updateScoreDetail"/>
-        <property name="cronExpression" value="0 0 3 * * ?"/><!-- 每天凌晨一点触发一次 -->
+        <property name="cronExpression" value="0 0 3 * * ?"/><!-- 每天凌晨3点触发一次 -->
+    </bean>
+    <bean id="twoOclockTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="twoOclockTaskDetail"/>
+        <property name="cronExpression" value="0 0 2 * * ?"/><!-- 每天凌晨2点触发一次 -->
+    </bean>
+    <bean id="twoOclockTaskDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="memberTaskHistoryService"/>
+        <property name="targetMethod" value="twoOclockScheduledJob"/>
+        <property name="concurrent" value="true"/>
+        <!-- 是否允许任务并发执行。当值为false时，表示必须等到前一个线程处理完毕后才再启一个新的线程 -->
     </bean>
     <bean id="testJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
         <property name="targetObject" ref="memberTaskHistoryService"/>

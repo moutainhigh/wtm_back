@@ -55,12 +55,24 @@ public class OfficeAccountService implements IOfficeAccountService {
 
     @Override
     @Transactional
-    public Boolean pushAddFinished(Map<String, String> params) {
-        String openid = params.get("openid");
-        String nickname = params.get("nickname");
-        String sexString = params.get("sex").toString();
-        String originId = params.get("originId");
-        Integer flag = Integer.valueOf(params.get("flag"));
+    public Boolean pushAddFinished(Map<String, Object> params) {
+        String openid="";
+        if (params.get("openid")!=null) {
+            openid = (String) params.get("openid").toString();
+        }
+        String nickname="";
+        if (params.get("nickname")!=null) {
+            nickname = params.get("nickname").toString();
+        }
+        String sexString = "";
+        if (params.get("sex")!=null) {
+            sexString = params.get("sex").toString();
+        }
+        String originId = "";
+        if (params.get("originId")!=null) {
+            originId = params.get("originId").toString();
+        }
+        Integer flag = Integer.valueOf(params.get("flag").toString());
         logger.info("openId:{},nickname:{},sex:{},originId:{},flag:{}", openid, nickname, sexString,originId,flag);
         if (flag == 0) {
             OfficialAccountWithScore officialAccountWithScore = officalAccountMapper.getOfficialAccountWithScoreById(originId, 0);
@@ -91,8 +103,7 @@ public class OfficeAccountService implements IOfficeAccountService {
         if (flag == 1) {
             OfficialAccountWithScore officialAccountWithScore = officalAccountMapper.getOfficialAccountWithScoreById(originId, 1);
             if (officialAccountWithScore != null) {
-                Integer sex = Integer.valueOf(sexString);
-                String key = nickname + ":" + sex + ":" + originId;
+                String key = nickname + ":" + sexString + ":" + originId;
                 logger.info("key is {}", key);
                 MemberCheck memberCheck = cacheService.getCacheByKey(key, MemberCheck.class);
                 logger.info("获取到的关注数据为:{}", JSON.toJSONString(memberCheck));
@@ -147,6 +158,11 @@ public class OfficeAccountService implements IOfficeAccountService {
                         throw new InfoException("任务不存在，或者任务已结束");
                     }
                 }
+            } else {
+                logger.info("任务不存在，或者任务已结束");
+                String key = nickname + ":" + sexString + ":" + originId;
+                cacheService.delKeyFromRedis(key);
+                return true;
             }
         }
         return false;

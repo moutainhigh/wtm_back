@@ -18,7 +18,7 @@ public interface IOfficeAccountService {
     /**
      * {"originId":""," nickname ":"昵称，如果unionId一致则换成unionId","time":"关注时间"}
      */
-    public Boolean pushAddFinished(Map<String,String> params);
+    public Boolean pushAddFinished(Map<String,Object> params);
 
     void taskFailPushToWechat();
 

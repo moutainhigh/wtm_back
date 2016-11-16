@@ -10,6 +10,8 @@
         <result column="memberScore" jdbcType="DECIMAL" property="memberScore"/>
         <result column="inValidScore" jdbcType="DECIMAL" property="inValidScore"/>
         <result column="avaliableScore" jdbcType="DECIMAL" property="avaliableScore"/>
+        <result column="rechargeCurrentScore" jdbcType="DECIMAL" property="rechargeCurrentScore"/>
+        <result column="rechargeTotalScore" jdbcType="DECIMAL" property="rechargeTotalScore"/>
         <result column="rate" jdbcType="DECIMAL" property="rate"/>
         <result column="updateTime" jdbcType="BIGINT" property="updateTime"/>
         <result column="createTime" jdbcType="BIGINT" property="createTime"/>
@@ -28,6 +30,16 @@
     </resultMap>
     <update id="updateOneAvaliableMemberScore">
         update wtm_member_score score set score.avaliableScore =#{avaliableScore} where score.memberId=#{memberId}
+    </update>
+    <update id="updateMemberAvaliableScore">
+        update wtm_member_score score
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="score.avaliableScore =case" suffix="end,">
+                <foreach collection="officialAddAvaliableScoreList" item="addAvaliable">
+                    when score.memberId=#{addAvaliable.memberId} then score.avaliableScore+#{addAvaliable.score}
+                </foreach>
+            </trim>
+        </trim>
     </update>
     <select id="getMemberScoreByMemberId" resultMap="BaseResultMap">
     select * from wtm_member_score s WHERE s.memberId=#{memberId};
@@ -50,9 +62,10 @@
                 <foreach collection="memberIdList" item="i" index="index">
                     when score.memberId=#{i} then score.memberScore +
                     (select CASE m.totalScore is NULL WHEN TRUE THEN 0 ELSE m.totalScore END AS totalScore from (
-                        select SUM(f.flowScore) totalScore from wtm_member_score s LEFT JOIN
-                        wtm_member_score_flow f ON f.memberScoreId=s.id
-                        WHERE s.memberId=#{i} AND f.createTime &lt; unix_timestamp(now()) AND f.createTime > #{time} AND f.typeId=7 AND f.flowScore &lt; 0) m
+                    select SUM(f.flowScore) totalScore from wtm_member_score s LEFT JOIN
+                    wtm_member_score_flow f ON f.memberScoreId=s.id
+                    WHERE s.memberId=#{i} AND f.createTime &lt; unix_timestamp(now()) AND f.createTime > #{time} AND
+                    f.typeId=7 AND f.flowScore &lt; 0) m
                     )
                 </foreach>
             </trim>
