@@ -12,13 +12,6 @@ import java.util.List;
  */
 public interface IMemberService {
     /**
-     * 用户注册
-     * @param registerMsg
-     * @return
-     */
-   public MemberInfoDto register(RegisterMsg registerMsg,Integer sourceType);
-
-    /**
      * 获取验证码
      * @param mobile
      * @param type
@@ -86,7 +79,7 @@ public interface IMemberService {
      */
      boolean modifyMemberName(Long memberId, String  memberName);
 
- /**
+     /**
       * 上传用户头像
       * @param memberId
       * @return

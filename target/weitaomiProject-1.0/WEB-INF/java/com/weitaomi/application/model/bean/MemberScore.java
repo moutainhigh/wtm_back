@@ -31,6 +31,16 @@ public class MemberScore extends BaseModel {
     @Column(name = "avaliableScore")
     private BigDecimal avaliableScore;
     /**
+     * 充值当前剩余米币
+     */
+    @Column(name = "rechargeCurrentScore")
+    private BigDecimal rechargeCurrentScore;
+    /**
+     * 充值历史总米币
+     */
+    @Column(name = "rechargeTotalScore")
+    private BigDecimal rechargeTotalScore;
+    /**
      * 可用倍率
      */
     @Column(name = "rate")
@@ -164,5 +174,37 @@ public class MemberScore extends BaseModel {
      */
     public void setAvaliableScore(BigDecimal avaliableScore) {
         this.avaliableScore = avaliableScore;
+    }
+
+    /**
+     * 获取充值当前剩余米币
+     * @return rechargeCurrentScore 充值当前剩余米币
+     */
+    public BigDecimal getRechargeCurrentScore() {
+        return this.rechargeCurrentScore;
+    }
+
+    /**
+     * 设置充值当前剩余米币
+     * @param rechargeCurrentScore 充值当前剩余米币
+     */
+    public void setRechargeCurrentScore(BigDecimal rechargeCurrentScore) {
+        this.rechargeCurrentScore = rechargeCurrentScore;
+    }
+
+    /**
+     * 获取充值历史总米币
+     * @return rechargeTotalScore 充值历史总米币
+     */
+    public BigDecimal getRechargeTotalScore() {
+        return this.rechargeTotalScore;
+    }
+
+    /**
+     * 设置充值历史总米币
+     * @param rechargeTotalScore 充值历史总米币
+     */
+    public void setRechargeTotalScore(BigDecimal rechargeTotalScore) {
+        this.rechargeTotalScore = rechargeTotalScore;
     }
 }

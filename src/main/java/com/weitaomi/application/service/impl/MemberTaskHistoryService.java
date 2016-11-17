@@ -119,6 +119,7 @@ public class MemberTaskHistoryService implements IMemberTaskHistoryService {
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
+            officeMemberMapper.delete(officeMember);
             cacheService.delKeyFromRedis(key);
         }
         int number1 = officeMemberMapper.deleteOverTimeUnfollowedAccounts(SystemConfig.TASK_CACHE_TIME);

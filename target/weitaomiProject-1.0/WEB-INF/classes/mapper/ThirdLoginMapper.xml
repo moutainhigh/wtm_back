@@ -42,4 +42,7 @@
   <select id="getThirdLoginByMemberId" resultType="com.weitaomi.application.model.bean.ThirdLogin">
     select * from wtm_third_login login where login.memberId=#{memberId}
   </select>
+  <select id="getNickNameAndSex" resultType="java.util.Map">
+    select m.sex,login.nickname from wtm_member m LEFT JOIN wtm_third_login login ON login.memberId=m.id WHERE m.id=#{memberId} limit 1;
+  </select>
 </mapper>

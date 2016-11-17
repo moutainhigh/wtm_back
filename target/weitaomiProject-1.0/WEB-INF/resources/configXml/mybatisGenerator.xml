@@ -20,11 +20,11 @@
                         password="${master1.jdbc.password}">
         </jdbcConnection>
 
-        <javaModelGenerator targetPackage="com.weitaomi.application.model.bean" targetProject="D:\program\weitaomi\wtm/src/main/java"/>
+        <javaModelGenerator targetPackage="com.weitaomi.application.model.bean" targetProject="D:\program\wtm_back\wtm_back/src/main/java"/>
 
-        <sqlMapGenerator targetPackage="mapper"  targetProject="D:\program\weitaomi\wtm/src/main/resources"/>
+        <sqlMapGenerator targetPackage="mapper"  targetProject="D:\program\wtm_back\wtm_back/src/main/resources"/>
 
-        <javaClientGenerator targetPackage="com.weitaomi.application.model.mapper" targetProject="D:\program\weitaomi\wtm/src/main/java" type="XMLMAPPER" />
+        <javaClientGenerator targetPackage="com.weitaomi.application.model.mapper" targetProject="D:\program\wtm_back\wtm_back/src/main/java" type="XMLMAPPER" />
         <!--<table tableName="wtm_member"  domainObjectName="Member">-->
             <!--<property name="useActualColumnNames" value="true"/>-->
             <!--<generatedKey column="id" sqlStatement="Mysql" identity="true"/>-->
