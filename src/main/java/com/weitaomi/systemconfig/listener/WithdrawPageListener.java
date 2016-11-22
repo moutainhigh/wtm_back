@@ -41,8 +41,5 @@ public class WithdrawPageListener implements ChannelAwareMessageListener {
                 }
             }
         });
-        if (paymentService.dealWithdrawsChange(param)){
-            logger.info("审核ID为{}的提现申请审核成功！",param.get("approveId"));
-        }
     }
 }

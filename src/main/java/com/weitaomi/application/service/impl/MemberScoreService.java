@@ -133,7 +133,7 @@ public class MemberScoreService implements IMemberScoreService {
                     if (typeId!=17) {
                         memberScore.setMemberScore(afterScore);
                     }
-//                    memberScore.setAvaliableScore(avaliableScore);
+                    memberScore.setAvaliableScore(avaliableScore);
                     memberScore.setRechargeCurrentScore(rechargeCurrentScore);
                     memberScore.setRechargeTotalScore(rechargeTotalScore);
                     memberScore.setRate(BigDecimal.ONE);
