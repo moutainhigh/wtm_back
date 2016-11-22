@@ -156,6 +156,6 @@ public class MemberTaskHistoryService implements IMemberTaskHistoryService {
         //统一处理十天前无用的任务记录
         Integer number1 = memberTaskHistoryMapper.deleteUselessRecord(7*24*60*60L);
         Integer number2 = memberTaskHistoryMapper.deleteUselessRecordDetail(7*24*60*60L);
-        logger.info("统一处理十天前无用的任务记录" + number1 + "条，任务详情" +number2+ "条");
+        logger.info("统一处理七天前无用的任务记录" + number1 + "条，任务详情" +number2+ "条");
     }
 }

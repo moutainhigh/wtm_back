@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
        xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
          http://www.springframework.org/schema/beans/spring-beans.xsd
@@ -17,57 +18,58 @@
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>
 
-    <!--<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">-->
-    <!--<property name="triggers">-->
-    <!--<list>-->
-    <!--<ref bean="testTrigger" />-->
-    <!--<ref bean="updateScoreTrigger" />-->
-    <!--<ref bean="twoOclockTrigger" />-->
-    <!--<ref bean="fourOclockRecordTrigger" />-->
-    <!--</list>-->
-    <!--</property>-->
-    <!--<property name="autoStartup" value="true"/>-->
-    <!--</bean>-->
-    <!--<bean id="testTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
-    <!--<property name="jobDetail" ref="testJobDetail"/>-->
-    <!--<property name="cronExpression" value="0 */10 * * * ?"/>&lt;!&ndash; 每隔10分钟触发一次 &ndash;&gt;-->
-    <!--</bean>-->
-    <!--<bean id="updateScoreTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
-    <!--<property name="jobDetail" ref="updateScoreDetail"/>-->
-    <!--<property name="cronExpression" value="0 0 3 * * ?"/>&lt;!&ndash; 每天凌晨3点触发一次 &ndash;&gt;-->
-    <!--</bean>-->
-    <!--<bean id="twoOclockTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
-    <!--<property name="jobDetail" ref="twoOclockTaskDetail"/>-->
-    <!--<property name="cronExpression" value="0 0 2 * * ?"/>&lt;!&ndash; 每天凌晨2点触发一次 &ndash;&gt;-->
-    <!--</bean>-->
-    <!--<bean id="fourOclockRecordTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
-    <!--<property name="jobDetail" ref="deleteUnusefulRecordDetail"/>-->
-    <!--<property name="cronExpression" value="0 0 4 * * ?"/>&lt;!&ndash; 每天凌晨47点触发一次 &ndash;&gt;-->
-    <!--</bean>-->
-    <!--<bean id="twoOclockTaskDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">-->
-    <!--<property name="targetObject" ref="memberTaskHistoryService"/>-->
-    <!--<property name="targetMethod" value="twoOclockScheduledJob"/>-->
-    <!--<property name="concurrent" value="true"/>-->
-    <!--&lt;!&ndash; 是否允许任务并发执行。当值为false时，表示必须等到前一个线程处理完毕后才再启一个新的线程 &ndash;&gt;-->
-    <!--</bean>-->
-    <!--<bean id="testJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">-->
-    <!--<property name="targetObject" ref="memberTaskHistoryService"/>-->
-    <!--<property name="targetMethod" value="deleteUnFinishedTask"/>-->
-    <!--<property name="concurrent" value="false"/>-->
-    <!--&lt;!&ndash; 是否允许任务并发执行。当值为false时，表示必须等到前一个线程处理完毕后才再启一个新的线程 &ndash;&gt;-->
-    <!--</bean>-->
-    <!--<bean id="updateScoreDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">-->
-    <!--<property name="targetObject" ref="memberTaskHistoryService"/>-->
-    <!--<property name="targetMethod" value="threeOclockScheduledJob"/>-->
-    <!--<property name="concurrent" value="false"/>-->
-    <!--&lt;!&ndash; 是否允许任务并发执行。当值为false时，表示必须等到前一个线程处理完毕后才再启一个新的线程 &ndash;&gt;-->
-    <!--</bean>-->
-    <!--<bean id="deleteUnusefulRecordDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">-->
-    <!--<property name="targetObject" ref="memberTaskHistoryService"/>-->
-    <!--<property name="targetMethod" value="fourOclockScheduledJob"/>-->
-    <!--<property name="concurrent" value="false"/>-->
-    <!--&lt;!&ndash; 是否允许任务并发执行。当值为false时，表示必须等到前一个线程处理完毕后才再启一个新的线程 &ndash;&gt;-->
-    <!--</bean>-->
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="testTrigger"/>
+                <ref bean="updateScoreTrigger"/>
+                <ref bean="twoOclockTrigger"/>
+                <ref bean="fourOclockRecordTrigger"/>
+            </list>
+        </property>
+        <property name="autoStartup" value="true"/>
+    </bean>
+    <bean id="testTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="testJobDetail"/>
+        <property name="cronExpression" value="0 */10 * * * ?"/><!-- 每隔10分钟触发一次 -->
+    </bean>
+    <bean id="twoOclockTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="twoOclockTaskDetail"/>
+        <property name="cronExpression" value="0 0 2 * * ?"/><!-- 每天凌晨2点触发一次 -->
+    </bean>
+    <bean id="updateScoreTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="updateScoreDetail"/>
+        <property name="cronExpression" value="0 0 3 * * ?"/><!-- 每天凌晨3点触发一次 -->
+    </bean>
+    <bean id="fourOclockRecordTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="deleteUnusefulRecordDetail"/>
+        <property name="cronExpression" value="0 0 4 * * ?"/><!-- 每天凌晨47点触发一次 -->
+    </bean>
+    <bean id="twoOclockTaskDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="memberTaskHistoryService"/>
+        <property name="targetMethod" value="twoOclockScheduledJob"/>
+        <property name="concurrent" value="true"/>
+        <!-- 是否允许任务并发执行。当值为false时，表示必须等到前一个线程处理完毕后才再启一个新的线程 -->
+    </bean>
+    <bean id="testJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="memberTaskHistoryService"/>
+        <property name="targetMethod" value="deleteUnFinishedTask"/>
+        <property name="concurrent" value="false"/>
+        <!-- 是否允许任务并发执行。当值为false时，表示必须等到前一个线程处理完毕后才再启一个新的线程 -->
+    </bean>
+    <bean id="updateScoreDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="memberTaskHistoryService"/>
+        <property name="targetMethod" value="threeOclockScheduledJob"/>
+        <property name="concurrent" value="false"/>
+        <!-- 是否允许任务并发执行。当值为false时，表示必须等到前一个线程处理完毕后才再启一个新的线程 -->
+    </bean>
+    <bean id="deleteUnusefulRecordDetail"
+          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="memberTaskHistoryService"/>
+        <property name="targetMethod" value="fourOclockScheduledJob"/>
+        <property name="concurrent" value="false"/>
+        <!-- 是否允许任务并发执行。当值为false时，表示必须等到前一个线程处理完毕后才再启一个新的线程 -->
+    </bean>
     <bean id="transcationManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"/>
     </bean>
@@ -83,8 +85,8 @@
         <property name="keepAliveSeconds" value="300"/>
         <!-- 线程池对拒绝任务(无线程可用)的处理策略 -->
         <property name="rejectedExecutionHandler">
-            <bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy" />
+            <bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy"/>
         </property>
     </bean>
-    <tx:annotation-driven transaction-manager="transcationManager" />
+    <tx:annotation-driven transaction-manager="transcationManager"/>
 </beans>

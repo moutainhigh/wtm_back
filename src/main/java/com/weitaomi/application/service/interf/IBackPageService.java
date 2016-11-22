@@ -11,4 +11,11 @@ import java.util.List;
 public interface IBackPageService {
     Page<ArticleShowDto> getAllArticle(Integer pageIndex, Integer pageSize);
     int patchCheckArticle(List<Long> poolIdList);
+    /**
+     * 上传文件
+     * @param path
+     * @param files
+     * @return
+     */
+    String uploadUpyunFiles(String path, String files,String suffix);
 }

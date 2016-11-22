@@ -229,7 +229,7 @@ public class PaymentService implements IPaymentService,Runnable {
                     approve.setIsPaid(1);
                     approveMapper.updateByPrimaryKeySelective(approve);
                     try {
-//                        JpushUtils.buildRequest(remark, approve.getMemberId());
+                        JpushUtils.buildRequest(remark, approve.getMemberId());
                     } catch (Exception e) {
                         logger.info("发送审核结果通知失败");
                     }

@@ -228,6 +228,7 @@ public class MyBatisTest extends BaseContextCase {
     }
     @Test
     public void testMemberScoreMapper(){
+        memberTaskHistoryService.twoOclockScheduledJob();
     }
 }
 

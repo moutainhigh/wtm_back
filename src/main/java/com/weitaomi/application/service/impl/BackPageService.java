@@ -7,6 +7,7 @@ import com.weitaomi.application.model.dto.ArticleShowDto;
 import com.weitaomi.application.model.mapper.TaskPoolMapper;
 import com.weitaomi.application.service.interf.IBackPageService;
 import com.weitaomi.application.service.interf.IMemberTaskPoolService;
+import com.weitaomi.systemconfig.constant.SystemConfig;
 import com.weitaomi.systemconfig.util.Page;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ import java.util.Map;
  * Created by Administrator on 2016/11/3.
  */
 @Service
-public class BackPageService implements IBackPageService {
+public class BackPageService extends BaseService implements IBackPageService {
     @Autowired
     private TaskPoolMapper taskPoolMapper;
 
@@ -37,5 +38,13 @@ public class BackPageService implements IBackPageService {
             return  number;
         }
         return 0;
+    }
+    @Override
+    public String uploadUpyunFiles(String path, String files, String suffix) {
+        boolean flag=super.uploadImage(path+"."+suffix, files);
+        if (flag) {
+            return SystemConfig.UPYUN_PREFIX +path+"."+suffix;
+        }
+        return null;
     }
 }

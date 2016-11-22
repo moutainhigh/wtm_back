@@ -13,10 +13,7 @@ import com.weitaomi.systemconfig.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import sun.misc.BASE64Decoder;
 
@@ -26,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Administrator on 2016/11/3.
@@ -188,5 +186,23 @@ public class BackPageController extends BaseController {
     @RequestMapping("/pc/backDeal/patchCheckArticle")
     public AjaxResult patchCheckArticle(List<Long> poolIdList){
         return AjaxResult.getOK(backPageService.patchCheckArticle(poolIdList));
+    }
+
+    /**
+     * 上传文件
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/backward/uploadUpyunFiles", method = RequestMethod.POST)
+    public AjaxResult uploadShowImage(HttpServletRequest request,@RequestBody(required = true) Map<String,String> params){
+        Long memberId=this.getUserId(request);
+        String files=params.get("files");
+        String path=params.get("path");
+        String suffix=params.get("suffix");
+        String yunPath="";
+        if (!StringUtil.isEmpty(files)&&!StringUtil.isEmpty(path)&&!StringUtil.isEmpty(suffix)){
+            yunPath=backPageService.uploadUpyunFiles(path,files,suffix);
+        }
+        return AjaxResult.getOK(yunPath);
     }
 }
