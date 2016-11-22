@@ -1,14 +1,11 @@
 package common;
 
-import com.weitaomi.systemconfig.alipay.StringUtils;
-import com.weitaomi.systemconfig.util.BrowserUtils;
 import com.weitaomi.systemconfig.util.StringUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.ArrayList;

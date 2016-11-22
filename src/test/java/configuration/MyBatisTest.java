@@ -22,6 +22,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.Base64Utils;
 
 import java.io.IOException;
@@ -50,8 +51,10 @@ public class MyBatisTest extends BaseContextCase {
     private MemberScoreFlowMapper memberScoreFlowMapper;
     @Autowired
     private IMemberScoreService memberScoreService;
-        @Autowired
+    @Autowired
     IMemberTaskHistoryService memberTaskHistoryService;
+    @Autowired
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
     @Test
     public void testAddMember() {
         Member member = new Member();
@@ -225,7 +228,6 @@ public class MyBatisTest extends BaseContextCase {
     }
     @Test
     public void testMemberScoreMapper(){
-        memberTaskHistoryService.deleteUnFinishedTask();
     }
 }
 

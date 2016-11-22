@@ -45,8 +45,12 @@
   <delete id="deleteMemberTaskUnfinished">
     DELETE FROM wtm_member_task_history  WHERE memberId=#{memberId} AND isFinished=#{type} AND taskFlag=#{originId}
   </delete>
-
-
+  <delete id="deleteUselessRecord">
+    DELETE FROM wtm_member_task_history WHERE createTime &lt; unix_timestamp(now())-#{time}
+  </delete>
+  <delete id="deleteUselessRecordDetail">
+    DELETE FROM wtm_member_task_history_detail WHERE createTime &lt; unix_timestamp(now())-#{time}
+  </delete>
   <select id="getMemberTaskHistoryList" resultMap="MyResultMap">
     select h.*,
      <include refid="detailSql"/>

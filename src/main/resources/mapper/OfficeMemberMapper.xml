@@ -37,7 +37,7 @@
     DELETE FROM wtm_office_member WHERE id=#{id}
   </delete>
   <select id="getOfficeMember" resultType="com.weitaomi.application.model.bean.OfficeMember">
-    select * from wtm_office_member m  WHERE m.memberId=#{memberId} AND m.officeAccountId=#{officialAccountId}
+    select * from wtm_office_member m  WHERE m.memberId=#{memberId} AND m.officeAccountId=#{officialAccountId} limit 1
   </select>
   <select id="getOfficeMemberList" resultType="com.weitaomi.application.model.bean.OfficeMember">
     select * from wtm_office_member m WHERE m.memberId=#{memberId} AND m.isAccessNow=0
@@ -53,7 +53,7 @@
   </select>
   <select id="getOfficialAddAvaliableScoreList"
           resultType="com.weitaomi.application.model.dto.OfficialAddAvaliableScore">
-    select id id,memberId memberId,addRewarScore score from wtm_office_member WHERE unix_timestamp(now())-finishedTime>#{limitTime} AND isAccessNow=1 AND isScoreAccess=0
+    select id id,memberId memberId,addRewarScore score from wtm_office_member WHERE unix_timestamp(now())-finishedTime>#{limitTime} AND finishedTime is not null AND isAccessNow=1 AND isScoreAccess=0
   </select>
   <select id="getOfficeMemberUnfinishedList" resultType="com.weitaomi.application.model.bean.OfficeMember">
     SELECT * FROM wtm_office_member WHERE isAccessNow=0 AND finishedTime is NULL AND unix_timestamp(now())-createTime>#{time}

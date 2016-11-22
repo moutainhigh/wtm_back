@@ -13,4 +13,6 @@ public interface MemberTaskHistoryMapper extends IBaseMapper<MemberTaskHistory> 
     Integer deleteMemberTaskUnfinished(@Param("memberId") Long memberId, @Param("type") Integer type, @Param("originId") String originId);
     int deleteUnfinishedTask(@Param("time") Integer time);
     int deleteUnfinishedTaskDetail(@Param("time") Integer time);
+    int deleteUselessRecord(@Param("time") Long time);
+    int deleteUselessRecordDetail(@Param("time") Long time);
 }

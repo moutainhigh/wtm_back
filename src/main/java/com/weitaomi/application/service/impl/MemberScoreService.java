@@ -19,11 +19,13 @@ import com.weitaomi.systemconfig.util.UUIDGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * Created by supumall on 2016/7/8.
@@ -50,7 +52,8 @@ public class MemberScoreService implements IMemberScoreService {
     private MemberMapper memberMapper;
     @Autowired
     private OfficeMemberMapper officeMemberMapper;
-
+    @Autowired
+    private AccountMapper accountMapper;
     @Override
     @Transactional
     public MemberScore addMemberScore(Long memberId, Long typeId,Integer isFinished, Double score, String sessionId) {
@@ -130,7 +133,7 @@ public class MemberScoreService implements IMemberScoreService {
                     if (typeId!=17) {
                         memberScore.setMemberScore(afterScore);
                     }
-                    memberScore.setAvaliableScore(avaliableScore);
+//                    memberScore.setAvaliableScore(avaliableScore);
                     memberScore.setRechargeCurrentScore(rechargeCurrentScore);
                     memberScore.setRechargeTotalScore(rechargeTotalScore);
                     memberScore.setRate(BigDecimal.ONE);
@@ -141,7 +144,6 @@ public class MemberScoreService implements IMemberScoreService {
                 memberScoreFlow.setMemberId(memberId);
                 memberScoreFlow.setTypeId(typeId);
                 memberScoreFlow.setIsFinished(isFinished);
-                memberScoreFlow.setDetail(memberScoreFlowType.getTypeDesc());
                 memberScoreFlow.setFlowScore(increaseScore);
                 memberScoreFlow.setMemberScoreAfter(memberScore.getMemberScore());
                 memberScoreFlow.setMemberScoreBefore(scoreBefore);
@@ -196,47 +198,15 @@ public class MemberScoreService implements IMemberScoreService {
         String tableName="member:extra:reward";
         Set<String> keys=cacheService.getAllKeysFromHashTable(tableName);
         List<RewardCountDto> rewardCountDtoList=cacheService.getFromHashTable(tableName,new ArrayList<String>(keys));
-        for (RewardCountDto rewardCountDto:rewardCountDtoList){
-            MemberScore memberScore1 = memberScoreMapper.getMemberScoreByMemberId(rewardCountDto.getParentId());
-            BigDecimal beforeAmount = BigDecimal.ZERO;
-            Double rewardScore=rewardCountDto.getTotalFlowScore();
-            if (memberScore1 != null) {
-                beforeAmount = memberScore1.getMemberScore();
-                BigDecimal afterScore = beforeAmount.add(BigDecimal.valueOf(rewardScore));
-                if (afterScore.doubleValue() < 0) {
-                    throw new BusinessException("可用积分不足");
+        ExecutorService executorService= Executors.newFixedThreadPool(10);
+        for (final RewardCountDto rewardCountDto:rewardCountDtoList){
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    dealUpdateExtraReward(rewardCountDto);
                 }
-                memberScore1.setMemberScore(afterScore);
-                memberScore1.setAvaliableScore(memberScore1.getAvaliableScore().add(BigDecimal.valueOf(rewardScore)));
-                memberScore1.setRate(BigDecimal.ONE);
-                memberScore1.setUpdateTime(DateUtils.getUnixTimestamp());
-                memberScoreMapper.updateByPrimaryKeySelective(memberScore1);
-            }else {
-                memberScore1=new MemberScore();
-                BigDecimal afterScore = beforeAmount.add(BigDecimal.valueOf(rewardScore));
-                memberScore1.setRate(BigDecimal.ONE);
-                memberScore1.setMemberId(rewardCountDto.getParentId());
-                memberScore1.setMemberScore(afterScore);
-                memberScore1.setAvaliableScore(afterScore);
-                memberScore1.setUpdateTime(DateUtils.getUnixTimestamp());
-                memberScore1.setCreateTime(DateUtils.getUnixTimestamp());
-                memberScoreMapper.insertSelective(memberScore1);
-            }
-            MemberScoreFlowType memberScoreFlowType1 = memberScoreFlowTypeMapper.selectByPrimaryKey(3L);
-            MemberScoreFlow memberScoreFlow1 = new MemberScoreFlow();
-            memberScoreFlow1.setMemberId(rewardCountDto.getParentId());
-            memberScoreFlow1.setTypeId(10L);
-            memberScoreFlow1.setIsFinished(1);
-            memberScoreFlow1.setDetail(memberScoreFlowType1.getTypeDesc());
-            memberScoreFlow1.setFlowScore(BigDecimal.valueOf(rewardScore));
-            memberScoreFlow1.setMemberScoreAfter(memberScore1.getMemberScore());
-            memberScoreFlow1.setMemberScoreBefore(beforeAmount);
-            memberScoreFlow1.setMemberScoreId(memberScore1.getId());
-            memberScoreFlow1.setCreateTime(DateUtils.getUnixTimestamp());
-            memberScoreFlowMapper.insertSelective(memberScoreFlow1);
-            //处理任务记录问题
-            String detail = "您邀请的好友"+rewardCountDto.getMemberName()+"今日完成了任务，平台额外奖励您好友收入的10%，累计"+BigDecimal.valueOf(rewardCountDto.getTotalFlowScore()).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue()+"米币";
-            memberTaskHistoryService.addMemberTaskToHistory(rewardCountDto.getParentId(), 7L, rewardScore, 1, detail, null,null);
+            });
+            this.dealUpdateExtraReward(rewardCountDto);
         }
         cacheService.delKeyFromRedis(tableName);
         return rewardCountDtoList.size();
@@ -256,4 +226,56 @@ public class MemberScoreService implements IMemberScoreService {
         Integer number = officeMemberMapper.updateOfficialMemberForAvaliable(idList);
         return number;
     }
+    private void dealUpdateExtraReward(RewardCountDto rewardCountDto){
+        MemberScore memberScore1 = memberScoreMapper.getMemberScoreByMemberId(rewardCountDto.getParentId());
+        BigDecimal beforeAmount = BigDecimal.ZERO;
+        Double rewardScore=rewardCountDto.getTotalFlowScore();
+        if (memberScore1 != null) {
+            beforeAmount = memberScore1.getMemberScore();
+            BigDecimal afterScore = beforeAmount.add(BigDecimal.valueOf(rewardScore));
+            if (afterScore.doubleValue() < 0) {
+                throw new BusinessException("可用积分不足");
+            }
+            memberScore1.setMemberScore(afterScore);
+            memberScore1.setAvaliableScore(memberScore1.getAvaliableScore().add(BigDecimal.valueOf(rewardScore)));
+            memberScore1.setRate(BigDecimal.ONE);
+            memberScore1.setUpdateTime(DateUtils.getUnixTimestamp());
+            memberScoreMapper.updateByPrimaryKeySelective(memberScore1);
+        }else {
+            memberScore1=new MemberScore();
+            BigDecimal afterScore = beforeAmount.add(BigDecimal.valueOf(rewardScore));
+            memberScore1.setRate(BigDecimal.ONE);
+            memberScore1.setMemberId(rewardCountDto.getParentId());
+            memberScore1.setMemberScore(afterScore);
+            memberScore1.setAvaliableScore(afterScore);
+            memberScore1.setUpdateTime(DateUtils.getUnixTimestamp());
+            memberScore1.setCreateTime(DateUtils.getUnixTimestamp());
+            memberScoreMapper.insertSelective(memberScore1);
+        }
+        MemberScoreFlowType memberScoreFlowType1 = memberScoreFlowTypeMapper.selectByPrimaryKey(3L);
+        MemberScoreFlow memberScoreFlow1 = new MemberScoreFlow();
+        memberScoreFlow1.setMemberId(rewardCountDto.getParentId());
+        memberScoreFlow1.setTypeId(10L);
+        memberScoreFlow1.setIsFinished(1);
+        memberScoreFlow1.setFlowScore(BigDecimal.valueOf(rewardScore));
+        memberScoreFlow1.setMemberScoreAfter(memberScore1.getMemberScore());
+        memberScoreFlow1.setMemberScoreBefore(beforeAmount);
+        memberScoreFlow1.setMemberScoreId(memberScore1.getId());
+        memberScoreFlow1.setCreateTime(DateUtils.getUnixTimestamp());
+        memberScoreFlowMapper.insertSelective(memberScoreFlow1);
+        //处理任务记录问题
+        String detail = "您邀请的好友"+rewardCountDto.getMemberName()+"今日完成了任务，平台额外奖励您好友收入的10%，累计"+BigDecimal.valueOf(rewardCountDto.getTotalFlowScore()).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue()+"米币";
+        memberTaskHistoryService.addMemberTaskToHistory(rewardCountDto.getParentId(), 7L, rewardScore, 1, detail, null,null);
+    }
+@Override
+    public void test(Long i){
+    System.out.println("===========>");
+        MemberScore account=memberScoreMapper.selectByPrimaryKey(i);
+        System.out.println(account.getMemberScore()+"===="+Thread.currentThread().getName());
+    try {
+        Thread.sleep(2000);
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+}
 }

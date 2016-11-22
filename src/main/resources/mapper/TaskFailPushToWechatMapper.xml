@@ -14,7 +14,7 @@
   </resultMap>
   <select id="getAllTaskFailPushToWechat"
           resultType="com.weitaomi.application.model.bean.TaskFailPushToWechat">
-    select * from wtm_task_fail_pushToWechat wechat WHERE wechat.isPushToWechat=0  AND wechat.id=2707 AND wechat.type IN
+    select * from wtm_task_fail_pushToWechat wechat WHERE wechat.isPushToWechat=0  AND wechat.type IN
     <foreach collection="idList" item="id" open="(" close=")" index="index" separator=",">
       #{id}
     </foreach>

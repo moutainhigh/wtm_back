@@ -34,7 +34,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created by supumall on 2016/7/22.
  */
 @Service
-public class PaymentService implements IPaymentService {
+public class PaymentService implements IPaymentService,Runnable {
     private Logger logger = LoggerFactory.getLogger(PaymentService.class);
     @Autowired
     private ICacheService cacheService;
@@ -80,6 +80,7 @@ public class PaymentService implements IPaymentService {
                 param.put("ip", ip);
                 param.put("memberId", memberId);
                 amqpTemplate.convertAndSend("dealWithdrawsChange." + param.get("approveId"), JSON.toJSONString(param));
+//                dealWithdrawsChange(param);
                 count++;
             }
         }
@@ -189,7 +190,7 @@ public class PaymentService implements IPaymentService {
                                 paymentHistoryList.add(paymentHistory);
                                 number++;
                             } else {
-                                String reason = WechatResutCode.getValue(wechat.getErr_code_des()).getValue();
+                                String reason = WechatResutCode.getValue(wechat.getErr_code()).getValue();
                                 Long memberId = (Long) param.get("memberId");
                                 String mobile = "13153212303";
                                 if (memberId != null) {
@@ -201,20 +202,22 @@ public class PaymentService implements IPaymentService {
                             }
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                       return false;
                     }
                     if (number == 1) {
                         int num = paymentHistoryMapper.batchInsertPayHistory(paymentHistoryList);
                         if (num == number) {
                             try {
-                                JpushUtils.buildRequest("提现申请审核通过，请到微信查看零钱明细", approve.getMemberId());
+//                                JpushUtils.buildRequest("提现申请审核通过，请到微信查看零钱明细", approve.getMemberId());
                             } catch (Exception e) {
                                 logger.info("发送审核结果通知失败");
                             }
                             return true;
                         } else throw new InfoException("提现审核失败");
                     } else {
-                        throw new InfoException("用户提现失败，请重新审批");
+                        String mobile = "13153212303";
+                        SendMCUtils.sendMessage(mobile, MessageFormat.format(new String(PropertiesUtil.getValue("withdraws.fail.msg")), approveId, "获取用户记录失败"));
+                        return false;
                     }
                 } else if (isApprove == 0) {
                     Double returnBackScore = approve.getAmount().multiply(BigDecimal.valueOf(100)).doubleValue();
@@ -226,7 +229,7 @@ public class PaymentService implements IPaymentService {
                     approve.setIsPaid(1);
                     approveMapper.updateByPrimaryKeySelective(approve);
                     try {
-                        JpushUtils.buildRequest(remark, approve.getMemberId());
+//                        JpushUtils.buildRequest(remark, approve.getMemberId());
                     } catch (Exception e) {
                         logger.info("发送审核结果通知失败");
                     }
@@ -271,5 +274,10 @@ public class PaymentService implements IPaymentService {
         } finally {
             lock.unlock();
         }
+    }
+
+    @Override
+    public void run() {
+
     }
 }

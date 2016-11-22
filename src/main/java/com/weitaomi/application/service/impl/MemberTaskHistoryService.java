@@ -112,15 +112,17 @@ public class MemberTaskHistoryService implements IMemberTaskHistoryService {
         for (OfficeMember officeMember : officeMemberList) {
             Map<String, Object> params = officeMemberMapper.getCacheKeyParams(officeMember.getMemberId());
             OfficialAccount officialAccount = officalAccountMapper.selectByPrimaryKey(officeMember.getOfficeAccountId());
-            String originId = officialAccount.getOriginId();
-            String key = null;
-            try {
-                key = Base64Utils.encodeToString(params.get("nickname").toString().getBytes("UTF-8")) + ":" + params.get("sex").toString() + ":" + originId;
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+            if (officialAccount!=null) {
+                String originId = officialAccount.getOriginId();
+                String key = null;
+                try {
+                    key = Base64Utils.encodeToString(params.get("nickname").toString().getBytes("UTF-8")) + ":" + params.get("sex").toString() + ":" + originId;
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                officeMemberMapper.delete(officeMember);
+                cacheService.delKeyFromRedis(key);
             }
-            officeMemberMapper.delete(officeMember);
-            cacheService.delKeyFromRedis(key);
         }
         int number1 = officeMemberMapper.deleteOverTimeUnfollowedAccounts(SystemConfig.TASK_CACHE_TIME);
         logger.info("删除未关注公众号" + number1 + "条");
@@ -134,6 +136,14 @@ public class MemberTaskHistoryService implements IMemberTaskHistoryService {
         officeAccountService.taskFailToAckAddRequest();
     }
 
+
+    @Override
+    public void twoOclockScheduledJob() {
+        //统一处理7天加米币奖励
+        Integer number1 = memberScoreService.addOfficialAccountScoreToAvaliable();
+        logger.info("处理统一处理7天加米币奖励" + number1 + "条");
+    }
+
     @Override
     public void threeOclockScheduledJob() {
         //统一处理平台的加成奖励
@@ -142,9 +152,10 @@ public class MemberTaskHistoryService implements IMemberTaskHistoryService {
     }
 
     @Override
-    public void twoOclockScheduledJob() {
-        //统一处理7天加米币奖励
-        Integer number1 = memberScoreService.addOfficialAccountScoreToAvaliable();
-        logger.info("处理统一处理7天加米币奖励" + number1 + "条");
+    public void fourOclockScheduledJob() {
+        //统一处理十天前无用的任务记录
+        Integer number1 = memberTaskHistoryMapper.deleteUselessRecord(7*24*60*60L);
+        Integer number2 = memberTaskHistoryMapper.deleteUselessRecordDetail(7*24*60*60L);
+        logger.info("统一处理十天前无用的任务记录" + number1 + "条，任务详情" +number2+ "条");
     }
 }

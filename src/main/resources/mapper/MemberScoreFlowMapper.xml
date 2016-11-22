@@ -13,7 +13,6 @@
     <result column="memberScoreBefore" jdbcType="DECIMAL" property="memberScoreBefore" />
     <result column="memberScoreAfter" jdbcType="DECIMAL" property="memberScoreAfter" />
     <result column="flowScore" jdbcType="DECIMAL" property="flowScore" />
-    <result column="detail" jdbcType="VARCHAR" property="detail" />
     <result column="createTime" jdbcType="BIGINT" property="createTime" />
   </resultMap>
   <select id="getMemberScoreFlowListByMemberId"

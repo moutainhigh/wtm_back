@@ -80,25 +80,33 @@ public class OfficeAccountService implements IOfficeAccountService {
             if (officialAccountWithScore != null) {
                 OfficeMember officeMember = officeMemberMapper.getOfficeMemberByOpenId(openid);
                 if (officeMember == null) {
-                    throw new BusinessException("没有此用户记录");
+                    logger.info("没有此用户记录");
+                    return true;
                 }
                 //增加积分以及积分记录
                 Long memberId = officeMember.getMemberId();
                 int num = officeMemberMapper.deleteFollowAccountsMember(officeMember.getId());
                 if (num > 0) {
-                    if (DateUtils.getUnixTimestamp() - officeMember.getCreateTime() < 7 * 24 * 60 * 60) {
-                        TaskPool taskPool = taskPoolMapper.getTaskPoolByOfficialId(officialAccountWithScore.getId(), 1);
-                        memberScoreService.addMemberScore(memberId, 7L, 1, -(taskPool.getRate().multiply(BigDecimal.valueOf(officialAccountWithScore.getScore()))).doubleValue(), UUIDGenerator.generate());
-                        memberTaskHistoryService.addMemberTaskToHistory(memberId, 11L, -(taskPool.getRate().multiply(BigDecimal.valueOf(officialAccountWithScore.getScore()))).doubleValue(), 1, "七天之内取消关注公众号" + officialAccountWithScore.getUserName(), null, null);
-                        memberScoreService.addMemberScore(officialAccountWithScore.getMemberId(), 9L, 1, officialAccountWithScore.getScore(), UUIDGenerator.generate());
-                        memberTaskHistoryService.addMemberTaskToHistory(officialAccountWithScore.getMemberId(), 12L, officialAccountWithScore.getScore(), 1, "用户七天之内取消关注公众号" + officialAccountWithScore.getUserName() + ",米币退还给公众号商家", null, null);
-                        logger.info("普通用户ID为{}的用户米币扣除成功，米币数为{}，商户用户ID为{}的用户米币返还成功，米币数为{}", memberId, -(taskPool.getRate().multiply(BigDecimal.valueOf(officialAccountWithScore.getScore()))).doubleValue(), officialAccountWithScore.getMemberId(), officialAccountWithScore.getScore());
-                        Map memberInfoDto = thirdLoginMapper.getNickNameAndSex(memberId);
-                        String key = Base64Utils.encodeToString(memberInfoDto.get("nickname").toString().getBytes())+ ":" +memberInfoDto.get("sex")+ ":" + officialAccountWithScore.getOriginId();
-                        cacheService.delKeyFromRedis(key);
+                    try {
+                        if (DateUtils.getUnixTimestamp() - officeMember.getCreateTime() < 7 * 24 * 60 * 60) {
+                            TaskPool taskPool = taskPoolMapper.getTaskPoolByOfficialId(officialAccountWithScore.getId(), null);
+                            memberScoreService.addMemberScore(memberId, 7L, 1, -(taskPool.getRate().multiply(BigDecimal.valueOf(officialAccountWithScore.getScore()))).doubleValue(), UUIDGenerator.generate());
+                            memberTaskHistoryService.addMemberTaskToHistory(memberId, 11L, -(taskPool.getRate().multiply(BigDecimal.valueOf(officialAccountWithScore.getScore()))).doubleValue(), 1, "七天之内取消关注公众号" + officialAccountWithScore.getUserName(), null, null);
+                            memberScoreService.addMemberScore(officialAccountWithScore.getMemberId(), 9L, 1, officialAccountWithScore.getScore(), UUIDGenerator.generate());
+                            memberTaskHistoryService.addMemberTaskToHistory(officialAccountWithScore.getMemberId(), 12L, officialAccountWithScore.getScore(), 1, "用户七天之内取消关注公众号" + officialAccountWithScore.getUserName() + ",米币退还给公众号商家", null, null);
+                            logger.info("普通用户ID为{}的用户米币扣除成功，米币数为{}，商户用户ID为{}的用户米币返还成功，米币数为{}", memberId, -(taskPool.getRate().multiply(BigDecimal.valueOf(officialAccountWithScore.getScore()))).doubleValue(), officialAccountWithScore.getMemberId(), officialAccountWithScore.getScore());
+                            Map memberInfoDto = thirdLoginMapper.getNickNameAndSex(memberId);
+                            String key = Base64Utils.encodeToString(memberInfoDto.get("nickname").toString().getBytes()) + ":" + memberInfoDto.get("sex") + ":" + officialAccountWithScore.getOriginId();
+                            cacheService.delKeyFromRedis(key);
+                            return true;
+                        }
+                    }catch (Exception e){
+                        logger.info("增加记录失败");
                         return true;
                     }
                 }
+            }else {
+                return true;
             }
         }
         if (flag == 1) {
@@ -123,11 +131,11 @@ public class OfficeAccountService implements IOfficeAccountService {
                         logger.info("关注记录表:{}", JSON.toJSONString(officeMember));
                         if (officeMember == null) {
                             JpushUtils.buildRequest("您关注的公众号任务：" + officialAccountWithScore.getUserName() + "，不存在或者已经结束", memberId);
-                            return false;
+                            return true;
                         }
                         if (officeMember.getIsAccessNow() == 1) {
                             JpushUtils.buildRequest("您已关注过公众号：" + officialAccountWithScore.getUserName() + "，该任务失效", memberId);
-                            return false;
+                            return true;
                         }
                         officeMember.setIsAccessNow(1);
                         officeMember.setOpenId(openid);
@@ -158,6 +166,8 @@ public class OfficeAccountService implements IOfficeAccountService {
                         JpushUtils.buildRequest(JpushUtils.getJpushMessage(memberId, "任务不存在，或者任务已结束"));
                         throw new InfoException("任务不存在，或者任务已结束");
                     }
+                }else {
+                    return true;
                 }
             } else {
                 logger.info("任务不存在，或者任务已结束");
@@ -176,6 +186,7 @@ public class OfficeAccountService implements IOfficeAccountService {
         idList.add(1L);
         List<TaskFailPushToWechat> taskFailPushToWechatList = taskFailPushToWechatMapper.getAllTaskFailPushToWechat(idList);
         for (TaskFailPushToWechat taskFailPushToWechat : taskFailPushToWechatList) {
+            logger.info("定时推送参数数据为：{}",JSON.toJSONString(taskFailPushToWechat));
             try {
                 String result = HttpRequestUtils.postStringEntity(taskFailPushToWechat.getPostUrl(), taskFailPushToWechat.getParams());
                 if (!StringUtil.isEmpty(result)) {
@@ -185,9 +196,12 @@ public class OfficeAccountService implements IOfficeAccountService {
                         taskFailPushToWechat.setIsPushToWechat(1);
                         taskFailPushToWechatMapper.updateByPrimaryKeySelective(taskFailPushToWechat);
                     }
+                    logger.info("定时任务执行陈宫，执行结果为："+flag);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+            }finally {
+
             }
         }
     }
@@ -198,11 +212,13 @@ public class OfficeAccountService implements IOfficeAccountService {
         idList.add(2L);
         List<TaskFailPushToWechat> taskFailPushToWechatList = taskFailPushToWechatMapper.getAllTaskFailPushToWechat(idList);
         for (TaskFailPushToWechat taskFailPushToWechat : taskFailPushToWechatList) {
+            logger.info("定时推送参数数据为：{}",JSON.toJSONString(taskFailPushToWechat));
             Boolean flag = this.pushAddFinished((Map)JSON.parseObject(taskFailPushToWechat.getParams()));
             if (flag){
                 taskFailPushToWechat.setIsPushToWechat(1);
                 taskFailPushToWechatMapper.updateByPrimaryKeySelective(taskFailPushToWechat);
             }
+            logger.info("定时任务执行陈宫，执行结果为："+flag);
         }
     }
 

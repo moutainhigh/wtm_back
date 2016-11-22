@@ -39,4 +39,6 @@ public interface IMemberTaskHistoryService {
     void threeOclockScheduledJob();
 
     void twoOclockScheduledJob();
+
+    void fourOclockScheduledJob();
 }

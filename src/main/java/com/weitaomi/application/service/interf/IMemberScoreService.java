@@ -28,4 +28,6 @@ public interface IMemberScoreService {
     Integer updateExtraRewardTimer();
 
     Integer addOfficialAccountScoreToAvaliable();
+
+    void test(Long i);
 }

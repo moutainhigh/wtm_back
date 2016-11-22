@@ -6,6 +6,7 @@ import com.weitaomi.systemconfig.dataFormat.AjaxResult;
 import com.weitaomi.systemconfig.exception.BusinessException;
 import com.weitaomi.systemconfig.util.IpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,6 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 public class MemberScorePCController extends BaseController{
     @Autowired
     private IMemberScoreService memberScoreService;
+    @Autowired
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
     /**
      * 增加的积分类型
      * @param typeId
@@ -37,4 +40,20 @@ public class MemberScorePCController extends BaseController{
         }
         return AjaxResult.getOK(memberScoreService.addMemberScore(memberId, typeId,isFinished, score, sessionId));
     }
+    @ResponseBody
+    @RequestMapping(value = "/justForTest",method = RequestMethod.POST)
+    AjaxResult justForTest(HttpServletRequest request){
+        for (long i=1;i<=5;i++) {
+            final long finalI = i;
+            threadPoolTaskExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    memberScoreService.test(finalI);
+                }
+            });
+        }
+        return AjaxResult.getOK();
+    }
+
+
 }

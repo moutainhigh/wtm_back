@@ -9,6 +9,7 @@ import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.ChannelAwareMessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.Map;
 
@@ -23,13 +24,23 @@ public class WithdrawPageListener implements ChannelAwareMessageListener {
     private Gson2JsonMessageConverter messageConverter;
     @Autowired
     private AmqpTemplate amqpTemplate;
+    @Autowired
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
     @Override
     public void onMessage(Message message, Channel channel) throws Exception {
         channel.basicQos(100);
         String params=(String)messageConverter.fromMessage(message);
-        Map<String,Object> param= (Map<String,Object>)JSONObject.parse(params);
+        final Map<String,Object> param= (Map<String,Object>)JSONObject.parse(params);
         logger.info("审核ID为{}的提现申请进入审核队列！",param.get("approveId"));
         channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+        threadPoolTaskExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (paymentService.dealWithdrawsChange(param)){
+                    logger.info("审核ID为{}的提现申请审核成功！",param.get("approveId"));
+                }
+            }
+        });
         if (paymentService.dealWithdrawsChange(param)){
             logger.info("审核ID为{}的提现申请审核成功！",param.get("approveId"));
         }
