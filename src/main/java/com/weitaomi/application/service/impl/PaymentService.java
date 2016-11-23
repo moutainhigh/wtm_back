@@ -198,7 +198,7 @@ public class PaymentService implements IPaymentService,Runnable {
                                     mobile = member.getTelephone();
                                 }
                                 SendMCUtils.sendMessage(mobile, MessageFormat.format(new String(PropertiesUtil.getValue("withdraws.fail.msg")), approveId, reason));
-                                throw new BusinessException("提现审核失败");
+                                return false;
                             }
                         }
                     } catch (Exception e) {
@@ -215,7 +215,7 @@ public class PaymentService implements IPaymentService,Runnable {
                             return true;
                         } else throw new InfoException("提现审核失败");
                     } else {
-                        String mobile = "13153212303";
+                        String mobile = "13105187050";
                         SendMCUtils.sendMessage(mobile, MessageFormat.format(new String(PropertiesUtil.getValue("withdraws.fail.msg")), approveId, "获取用户记录失败"));
                         return false;
                     }

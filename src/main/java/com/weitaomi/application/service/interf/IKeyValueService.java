@@ -9,4 +9,5 @@ import java.util.List;
  */
 public interface IKeyValueService {
     public List<KeyValueDto> getKeyValueDtoList(String mapKey,String id);
+    boolean keyIsExist(String tableName, String idKey);
 }
