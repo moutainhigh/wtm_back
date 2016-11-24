@@ -79,13 +79,11 @@ function getApproveListTr(account,name,time,amount,isCheck,memberId,listid,i) {
     }else if(isCheck==0){
         checkState='拒绝'
     }
-    var str = "[@/\$%&<>]+";
+    var str = "[/\$%&<>]+";
     var reg = new RegExp(str);
     if (reg.test(name)){
-        alert("有非法字符!");
-        var names=encodeURI(name);
-        alert(names);
-    }else {var names=name;}
+        var names = name.replace(/[/\$%&<>]/g, '');
+    }else {names=name;}
     var approvecontent = '<li class="list '+account+'">'+
         '<div class="col-xs-1 childcheck"><label class="col-xs-12">'+i+'<input class="radiocleck" type="checkbox" value=""/></label></div>' +
         '<div class="col-xs-1 paytype">'+payType+'</div>' +

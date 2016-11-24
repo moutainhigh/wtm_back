@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>静态图片上传CDN</title>
+    <link rel="shortcut icon" href="../../code/img/wtm.ico"/>
+    <link href="../../code/css/backcommon.css" rel="stylesheet" type="text/css"/>
+    <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="../../code/js/backmanage/CDNjs.js"></script>
+    <script src="../../code/js/lrz.mobile.min.js"></script>
+    <script src="../../code/js/backmanage/uploadpreview.js"></script>
+    <script>
+        $(function(){
+            $(".uploadfile").click(function(){
+                loadupyun();
+            })
+        })
+    </script>
+</head>
+<body>
+<header>
+    <h1>微淘米后台管理系统</h1>
+</header>
+<div class="content">
+    <aside class="col-lg-1 col-xs-2">
+        <a href="/frontPage/backward/withdraws.html" id="withdrawApproveList">提现申请</a>
+        <a href="/frontPage/backward/CDNimg.html" class="atagactive">图片上传</a>
+        <a href="/frontPage/backward/CDNfile.html">文件上传</a>
+        <a href="/frontPage/backward/inforsearch.html" class="nobd">用户信息查询</a>
+    </aside>
+    <article class="col-lg-11 col-xs-10">
+        <ul class="cdnrecord">
+            <li>文件CDN地址记录</li>
+        </ul>
+        <!--../../code/img/wap/header.png-->
+        <div class="boxborder">
+            <div class="clectimg">
+                <div class="preview"><img id="previewimg" src="http://weitaomi.b0.upaiyun.com/back/CDNimg/header1479964273503.png"/></div>
+                <div class="filebox">
+                    <input class="filebackgd" value="点击选择文件"/>
+                    <input id="clectfile" type="file" name="clectfile" value="点击选择文件" onchange="change('previewimg','clectfile')"/>
+                </div>
+            </div>
+            <div class="imgaddress">
+                <div class="boxcontainer">
+                    <div class="CDNaddress">
+                        <p>一级目录：</p>
+                        <select id="onemenu">
+                            <option value="-1">请选择</option>
+                        </select>
+                    </div>
+                    <div class="CDNaddress">
+                        <p>二级目录：</p>
+                        <select id="twomenu">
+                            <option value="-1">请选择</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="boxcontainer">
+                    <div class="CDNaddress">
+                        <p>文件名称：</p>
+                        <input type="text" id="title" value="请输入文件名" onfocus="if(this.value=='请输入文件名'){this.value=''}"/>
+                    </div>
+                    <div class="CDNaddress">
+                        <p>图片格式：</p>
+                        <select id="imgtype">
+                            <option value="0">png</option>
+                            <option value="1">jpg</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="endaddress">
+                    <p>文件CDN地址：</p>
+                    <div id="cdnaddress" class="pathstyle" placeholder="点击生成CDN地址"></div>
+                </div>
+            </div>
+            <input type="button" class="uploadfile" value="上传文件">
+        </div>
+    </article>
+</div>
+</body>
+</html>
