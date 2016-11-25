@@ -2,10 +2,12 @@ package com.weitaomi.application.service.impl;
 
 import com.weitaomi.systemconfig.exception.InfoException;
 import com.weitaomi.systemconfig.fileManage.UpYun;
+import com.weitaomi.systemconfig.util.StreamUtils;
 import sun.misc.BASE64Decoder;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Administrator on 2016/8/16.
@@ -46,5 +48,23 @@ public class BaseService {
             }
         flag= upYun.writeFile(imageUrl,imageFile);
         return flag;
+    }
+
+    public boolean uploadYunFiles(File file,String filePath){
+        UpYun upYun = new UpYun("weitaomi", "weitaomi", "Weitaomi@Woyun");
+        try {
+            InputStream fileInputStream = new FileInputStream(file);
+            byte[] bytes = StreamUtils.InputStreamTOByte(fileInputStream);
+            Map map=new HashMap();
+            map.put("x-gmkerl-exif-switch",true);
+            map.put("x-gmkerl-exif-switch",true);
+            boolean flag = upYun.writeFile(filePath, bytes);
+            return flag;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return  false;
     }
 }

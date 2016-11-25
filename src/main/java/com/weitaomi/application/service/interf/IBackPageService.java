@@ -3,6 +3,7 @@ package com.weitaomi.application.service.interf;
 import com.weitaomi.application.model.dto.ArticleShowDto;
 import com.weitaomi.systemconfig.util.Page;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -17,5 +18,5 @@ public interface IBackPageService {
      * @param files
      * @return
      */
-    String uploadUpyunFiles(String path, String files,String suffix);
+    String uploadUpyunFiles(String path, File files, String suffix);
 }
