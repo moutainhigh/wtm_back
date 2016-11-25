@@ -194,13 +194,13 @@ public class BackPageController extends BaseController {
      */
     @ResponseBody
     @RequestMapping(value = "/backward/uploadUpyunFiles", method = RequestMethod.POST)
-    public AjaxResult uploadShowImage(HttpServletRequest request,@RequestBody(required = true) Map<String,String> params){
+    public AjaxResult uploadShowImage(HttpServletRequest request,@RequestBody(required = true) Map<String,Object> params){
         Long memberId=this.getUserId(request);
-        String files=params.get("files");
-        String path=params.get("path");
-        String suffix=params.get("suffix");
+        File files=(File) params.get("files");
+        String path=(String)params.get("path");
+        String suffix=(String)params.get("suffix");
         String yunPath="";
-        if (!StringUtil.isEmpty(files)&&!StringUtil.isEmpty(path)&&!StringUtil.isEmpty(suffix)){
+        if (files!=null&&!StringUtil.isEmpty(path)&&!StringUtil.isEmpty(suffix)){
             yunPath=backPageService.uploadUpyunFiles(path,files,suffix);
         }
         return AjaxResult.getOK(yunPath);
