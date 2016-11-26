@@ -7,30 +7,10 @@
     <link href="../../code/css/backcommon.css" rel="stylesheet" type="text/css"/>
     <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="../../code/js/backmanage/CDNjs.js"></script>
+    <script src="../../code/js/jquery.base64.js"></script>
     <script src="../../code/js/lrz.mobile.min.js"></script>
     <script>
         $(function(){
-//            $(".CDNaddress").change(function(){
-//                var oneselect=$("#onemenu option:selected");
-//                var onemenu=oneselect.text();
-//                var twoselect=$("#twomenu option:selected");
-//                var twomenu=twoselect.text();
-//                $("#title").change(function (){
-//                    var timestamp=new Date().getTime();
-//                    $("#title").attr("name",timestamp);
-//                });
-//                var timestamp=$("#title").attr("name");
-//                console.log(timestamp);
-//                var title=$("#title").val();
-//                console.log("第二个title"+title);
-//                var imgselect=$("#imgtype option:selected");
-//                var imgtype=imgselect.text();
-//                console.log("val"+oneselect.val());
-//                console.log("val"+twoselect.val());
-//                if(oneselect.val()!=-1&&timestamp!=undefined){
-//                    $(".endfileads textarea").html('/'+onemenu+'/'+twomenu+'/'+title+timestamp+imgtype)
-//                }
-//            })
             $(".uploadfile").click(function(){
                 loadupyun();
             })
@@ -50,41 +30,48 @@
     </aside>
     <article class="col-lg-11 col-xs-10">
         <div class="boxborder">
-            <div class="filepreview">
-                <input id="fileupload" type="file" name="fileupload" value="点击选择文件" onchange="filechange(this)"/>
-            </div>
-            <div class="fileaddress">
-                <div class="CDNaddress CDNfileads">
-                    <p>一级目录：</p>
-                    <select id="onemenu">
-                        <option value="-1">请选择</option>
-                    </select>
+            <div class="autoborder">
+                <div class="fileshow">
+                    <p id="fileshowtitle">上传内容预览</p>
+                    <p id="fileshowcont"></p>
                 </div>
-                <div class="CDNaddress CDNfileads">
-                    <p>二级目录：</p>
-                    <select id="twomenu">
-                        <option value="-1">请选择</option>
-                    </select>
+                <div class="fileaddress">
+                    <div class="CDNaddress filepreview">
+                        <input id="fileupload" type="file" name="fileupload" value="点击选择文件" onchange="readAsText(this)"/>
+                    </div>
+                    <div class="CDNaddress CDNfileads">
+                        <p>一级目录：</p>
+                        <select id="onemenu">
+                            <option value="-1">请选择</option>
+                        </select>
+                    </div>
+                    <div class="CDNaddress CDNfileads">
+                        <p>二级目录：</p>
+                        <select id="twomenu">
+                            <option value="-1">请选择</option>
+                        </select>
+                    </div>
+                    <div class="CDNaddress CDNfileads">
+                        <p>文件名称：</p>
+                        <input type="text" id="title" value="请输入文件名" onfocus="if(this.value=='请输入文件名'){this.value=''}"/>
+                    </div>
+                    <div class="CDNaddress CDNfileads">
+                        <p>图片格式：</p>
+                        <select id="imgtype">
+                            <option value="0">js</option>
+                            <option value="1">css</option>
+                            <option value="1">apk</option>
+                        </select>
+                    </div>
+                    <div class="CDNaddress endfileads">
+                        <p>文件CDN地址：</p>
+                        <div id="cdnaddress" class="pathstyle fileadsstyle"></div>
+                    </div>
+                    <input type="button" class="uploadfile" id="fileup" value="上传文件">
                 </div>
-                <div class="CDNaddress CDNfileads">
-                    <p>文件名称：</p>
-                    <input type="text" id="title" value="请输入文件名" onfocus="if(this.value=='请输入文件名'){this.value=''}"/>
-                </div>
-                <div class="CDNaddress CDNfileads">
-                    <p>图片格式：</p>
-                    <select id="imgtype">
-                        <option value="0">js</option>
-                        <option value="1">css</option>
-                        <option value="1">apk</option>
-                    </select>
-                </div>
-
-                <div class="endfileads">
-                    <p>文件CDN地址：</p>
-                    <div id="cdnaddress" class="pathstyle" placeholder="点击生成CDN地址"></div>
-                    <!--<textarea rows="3"></textarea>-->
-                </div>
-                <input type="button" class="uploadfile" id="fileup" value="上传文件">
+                <ul class="cdnrecord">
+                    <li>文件CDN地址记录</li>
+                </ul>
             </div>
         </div>
     </article>

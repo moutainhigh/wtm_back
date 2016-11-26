@@ -1,23 +1,18 @@
 /**
  * Created by Administrator on 2016/11/22.
  */
-/**
- * Created by Administrator on 2016/11/19.
- */
 $(function(){
-    //声明省
+    //声明一级目录
     var onemenu = ["wap", "pc", "back", "common","app/version"]; //直接声明Array
-//声明市
+//声明二级目录
     var twomenu = [
         ["login", "register", "common", "index","purse","center","taskrecord","invite","daysign"],
         ["index", "common","login","bussiness","paycash","publishArticle"],
         ["login", "withdraws", "CDNimg" , "CDNfile","inforsearch"],
-        ["pcwap","pcback"],
+        ["pcwap","pcback","common"],
         ["download"]
     ];
-    //设置一个省的公共下标
-    var pIndex = -1;
-//先设置一级地址的值
+    var pIndex = -1;//设置公共下标
     onemenu.forEach(function(){
         var option=document.createElement("option");
         option.setAttribute("value",++pIndex);
@@ -41,7 +36,6 @@ $(function(){
         }
     })
 });
-var imagefile='';
 function menu(){
     var oneselect=$("#onemenu option:selected");
     var onemenu=oneselect.text();
@@ -63,28 +57,32 @@ function menu(){
     }
     $("#cdnaddress").attr("name",pathaddress);
 };
+var imagefile="";
+var flag="";
 function loadupyun(){
     menu();
     var path= $("#cdnaddress").attr("name");
     var suffix=$("#imgtype").attr("name");
-    var json={};// 定义一个json对象
-    json.path=path;// 增加一个新属性，此属性是数组
-    json.files=imagefile;
-    json.suffix=suffix;
-    console.log(json);
-    var jsonstring=JSON.stringify(json);
-   console.log(jsonstring);
+    var obj=new UploadFiles(path,imagefile,suffix,flag)
+    var requestObj = JSON.stringify(obj);
+    console.log(obj);
+    console.log(requestObj);
     if(path!=null&&path!=undefined&&imagefile!=null){
         $.ajax({
             type:'post',
             url:'/backward/uploadUpyunFiles',
+            contentType: "application/json",
             dataType:'json',
-            contentType:'application/json',
-            data:jsonstring,
+            timeout:180000,
+            data:requestObj,
             success:function(params){
                 var json=eval(params);
                 if(json.data!=null&&json.errorCode==0){
+                    $("#cdnaddress").empty();
                     $("#cdnaddress").html(json.data);
+                    var li=document.createElement('li');
+                    li.innerHTML=json.data;
+                    document.getElementsByClassName("cdnrecord")[0].appendChild(li);
                 }else if(json.errorCode==4){
                     alert(json.message);
                 }
@@ -95,14 +93,54 @@ function loadupyun(){
         })
     }
 }
-
-function filechange(file){
-    //var file = document.getElementById(fileId);
-    console.log(file)
-    lrz(file.files[0],function(rst){
-        alert("aaa");
-        imagefile = rst.base64;
-        console.log(imagefile)
-    });
+function readAsDataURL(file){
+    var file = file.files[0];
+    if(!/image\/\w+/.test(file.type)){
+        alert("看清楚，这个需要图片！");
+        return false;
+    }
+    var reader = new FileReader();
+    //将文件以Data URL形式读入页面
+    reader.readAsDataURL(file);
+    reader.onload=function(e){
+        var result=$("#previewimg");
+        result.attr("src",this.result);
+        imagefile=this.result;
+        flag=0;
+    }
 }
+function readAsText(file){
+    var file = file.files[0];
+    var reader = new FileReader();
+    //将文件以文本形式读入页面
+    reader.readAsText(file);
+    reader.onload=function(f){
+        //显示文件
+        $("#fileshowcont").html(this.result);
+        imagefile=this.result;
+        flag=1;
+    }
+}
+$.fn.serializeObject = function() {
+    var o = {};
+    var a = this.serializeArray();
+    $.each(a, function() {
+        if (o[this.name]) {
+            if (!o[this.name].push) {
+                o[this.name] = [o[this.name]];
+            }
+            o[this.name].push(this.value || '');
+        } else {
+            o[this.name] = this.value || '';
+        }
+    });
+    return o;
+};
+function UploadFiles(path,files,suffix,flag){
+    this.path=path;
+    this.files=files;
+    this.suffix=suffix;
+    this.flag=flag
+}
+
 

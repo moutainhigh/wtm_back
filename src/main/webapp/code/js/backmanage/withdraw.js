@@ -24,6 +24,7 @@ function getApproveList(pageIndex,pageSize) {
         type: 'get',
         dataType: 'json',
         async:false,
+        timeout:180000,
         url: '/pc/admin/paymemberCallBack/getApproveList',
         data: {pageIndex:pageIndex,pageSize:pageSize},
         success: function (params){
@@ -149,6 +150,7 @@ console.log(obj.parentNode);
                 type: 'post',
                 dataType: 'json',
                 contentType:'application/json',
+                timeout:180000,
                 url: '/pc/admin/paymemberCallBack/patchWechatCustomers',
                 data: jsonstring,
                 success: function (params){
@@ -216,6 +218,7 @@ function batchReview(){
                     type: 'post',
                     dataType: 'json',
                     contentType:'application/json',
+                    timeout:180000,
                     url: '/pc/admin/paymemberCallBack/patchWechatCustomers',
                     data:jsonstring,
                     success: function (params){
