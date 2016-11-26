@@ -199,9 +199,10 @@ public class BackPageController extends BaseController {
         String files=params.get("files");
         String path=params.get("path");
         String suffix=params.get("suffix");
+        Integer flag=Integer.parseInt(params.get("flag").toString());
         String yunPath="";
         if (!StringUtil.isEmpty(files)&&!StringUtil.isEmpty(path)&&!StringUtil.isEmpty(suffix)){
-            yunPath=backPageService.uploadUpyunFiles(path,files,suffix);
+            yunPath=backPageService.uploadUpyunFiles(path,files,suffix,flag);
         }
         return AjaxResult.getOK(yunPath);
     }

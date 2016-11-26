@@ -17,5 +17,5 @@ public interface IBackPageService {
      * @param files
      * @return
      */
-    String uploadUpyunFiles(String path, String files,String suffix);
+    String uploadUpyunFiles(String path, String files,String suffix,Integer temp);
 }
