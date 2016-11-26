@@ -13,7 +13,6 @@ import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -41,8 +40,8 @@ public class BackPageService extends BaseService implements IBackPageService {
         return 0;
     }
     @Override
-    public String uploadUpyunFiles(String path, File files, String suffix) {
-        boolean flag=super.uploadYunFiles(files,path+"."+suffix);
+    public String uploadUpyunFiles(String path, String files, String suffix) {
+        boolean flag=super.uploadImage(path+"."+suffix, files.substring(files.indexOf("base64")+7));
         if (flag) {
             return SystemConfig.UPYUN_PREFIX +path+"."+suffix;
         }
