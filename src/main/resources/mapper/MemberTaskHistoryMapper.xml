@@ -63,4 +63,8 @@
     from wtm_member_task_history h
     WHERE h.memberId=#{memberId} AND h.isFinished=#{type} AND h.taskFlag=#{originId}
   </select>
+  <select id="getMemberTaskHistoryInformation"
+          resultType="com.weitaomi.application.model.dto.MemberTaskHistoryInformation">
+    select d.taskName,d.taskDesc,d.pointCount,d.createTime from wtm_member_task_history h LEFT JOIN wtm_member_task_history_detail d ON d.taskHistoryId=h.id WHERE h.memberId=#{memberId}
+  </select>
 </mapper>

@@ -35,6 +35,11 @@ public class PaymentApprove  extends BaseModel {
      */
     @Column(name = "amount")
     private BigDecimal amount;
+    /**
+     * 提现手续费
+     */
+    @Column(name = "extraAmount")
+    private BigDecimal extraAmount;
 
     /**
      * 备注
@@ -193,5 +198,21 @@ public class PaymentApprove  extends BaseModel {
      */
     public void setPayType(Integer payType) {
         this.payType = payType;
+    }
+
+    /**
+     * 获取提现手续费
+     * @return extraAmount 提现手续费
+     */
+    public BigDecimal getExtraAmount() {
+        return this.extraAmount;
+    }
+
+    /**
+     * 设置提现手续费
+     * @param extraAmount 提现手续费
+     */
+    public void setExtraAmount(BigDecimal extraAmount) {
+        this.extraAmount = extraAmount;
     }
 }

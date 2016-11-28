@@ -2,7 +2,8 @@ package com.weitaomi.application.model.bean;
 
 import com.weitaomi.application.model.BaseModel;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Table;
 
 @Table(name = "wtm_member_invited_record")
 public class MemberInvitedRecord extends BaseModel {
@@ -23,6 +24,11 @@ public class MemberInvitedRecord extends BaseModel {
      */
     @Column(name = "isAccessible")
     private Integer isAccessible;
+    /**
+     * 是否奖励邀请者
+     */
+    @Column(name = "isAccessForInvitor")
+    private Integer isAccessForInvitor;
     /**
      * 创建日期
      */
@@ -115,5 +121,21 @@ public class MemberInvitedRecord extends BaseModel {
      */
     public void setIsAccessible(Integer isAccessible) {
         this.isAccessible = isAccessible;
+    }
+
+    /**
+     * 获取是否奖励邀请者
+     * @return isAccessForInvitor 是否奖励邀请者
+     */
+    public Integer getIsAccessForInvitor() {
+        return this.isAccessForInvitor;
+    }
+
+    /**
+     * 设置是否奖励邀请者
+     * @param isAccessForInvitor 是否奖励邀请者
+     */
+    public void setIsAccessForInvitor(Integer isAccessForInvitor) {
+        this.isAccessForInvitor = isAccessForInvitor;
     }
 }

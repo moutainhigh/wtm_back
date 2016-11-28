@@ -145,7 +145,9 @@ public class MemberScoreService implements IMemberScoreService {
                         if (typeId!=17&&typeId!=16) {
                             memberScore.setMemberScore(afterScore);
                         }
-                        memberScore.setAvaliableScore(avaliableScore);
+                        if (typeId!=8) {
+                            memberScore.setAvaliableScore(avaliableScore);
+                        }
                         memberScore.setRechargeCurrentScore(rechargeCurrentScore);
                         memberScore.setRechargeTotalScore(rechargeTotalScore);
                         memberScore.setRate(BigDecimal.ONE);
@@ -225,7 +227,6 @@ public class MemberScoreService implements IMemberScoreService {
                     dealUpdateExtraReward(rewardCountDto);
                 }
             });
-            this.dealUpdateExtraReward(rewardCountDto);
         }
         cacheService.delKeyFromRedis(tableName);
         return rewardCountDtoList.size();
@@ -234,7 +235,7 @@ public class MemberScoreService implements IMemberScoreService {
     @Override
     public Integer addOfficialAccountScoreToAvaliable(){
         //todo  时间灵活修改
-        List<OfficialAddAvaliableScore> officialAddAvaliableScoreList = officeMemberMapper.getOfficialAddAvaliableScoreList(7*24*60L);
+        List<OfficialAddAvaliableScore> officialAddAvaliableScoreList = officeMemberMapper.getOfficialAddAvaliableScoreList(7*24*60*60L);
         List<Long> idList=new ArrayList<>();
         for (OfficialAddAvaliableScore officialAddAvaliableScore : officialAddAvaliableScoreList){
             MemberScore memberScore= this.addMemberScore(officialAddAvaliableScore.getMemberId(),17L,1,officialAddAvaliableScore.getScore(), UUIDGenerator.generate());

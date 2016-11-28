@@ -2,6 +2,7 @@ package com.weitaomi.application.controller;
 
 import com.weitaomi.application.controller.baseController.BaseController;
 import com.weitaomi.application.model.bean.Account;
+import com.weitaomi.application.model.dto.MemberSearch;
 import com.weitaomi.application.model.mapper.AccountMapper;
 import com.weitaomi.application.service.interf.IAppVersionService;
 import com.weitaomi.application.service.interf.IBackPageService;
@@ -205,5 +206,23 @@ public class BackPageController extends BaseController {
             yunPath=backPageService.uploadUpyunFiles(path,files,suffix,flag);
         }
         return AjaxResult.getOK(yunPath);
+    }
+    /**
+     * 获取查询详情
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/backward/getMemberInformationDetail", method = RequestMethod.POST)
+    public AjaxResult getMemberInformationDetail(Long memberId,Integer flag,Integer pageIndex,Integer pageSize){
+        return AjaxResult.getOK(backPageService.getMemberInformationDetail(memberId, flag, pageIndex, pageSize));
+    }
+    /**
+     * 获取查询详情
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/backward/getMemberInformation", method = RequestMethod.POST)
+    public AjaxResult getMemberInformation(@RequestBody MemberSearch memberSearch){
+        return AjaxResult.getOK(backPageService.getMemberInformation(memberSearch));
     }
 }

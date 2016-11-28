@@ -3,7 +3,10 @@ package com.weitaomi.application.model.mapper;
 import com.weitaomi.application.model.bean.Member;
 import com.weitaomi.application.model.bean.ThirdLogin;
 import com.weitaomi.application.model.dto.MemberInfoDto;
+import com.weitaomi.application.model.dto.MemberSearch;
+import com.weitaomi.application.model.dto.MemberSearchInformation;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.session.RowBounds;
 
 import java.util.List;
 import java.util.Map;
@@ -20,4 +23,5 @@ public interface MemberMapper extends IBaseMapper<Member> {
     List<Long> getAllMemberId();
     List<Map<String,Long>> getIsFollowWtmAccount(@Param("memberId") Long memberId, @Param("sourceType") Integer sourceType);
     int updateMemberPhoneType(@Param("memberId") Long memberId, @Param("phoneType") String phoneType);
+    List<MemberSearchInformation> getMemberSearchInformation(@Param("memberSearch") MemberSearch memberSearch, @Param("rowBounds") RowBounds rowBounds);
 }

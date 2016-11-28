@@ -9,6 +9,8 @@ import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.junit.Test;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Administrator on 2016/8/14.
@@ -16,19 +18,19 @@ import java.io.*;
 public class ImageUpLoadTest extends BaseContextCase {
     @Test
     public void testUpYun() throws IOException {
-
-        for (int i=2;i<7;i++) {
-            File file = new File("D:\\Documents\\Pictures\\123.jpg");
+            File file = new File("C:\\Users\\Administrator\\Desktop\\822308633497096971.png");
             try {
                 UpYun upYun = new UpYun("weitaomi", "weitaomi", "Weitaomi@Woyun");
                 InputStream fileInputStream = new FileInputStream(file);
                 byte[] bytes = StreamUtils.InputStreamTOByte(fileInputStream);
-                String imageUrl = "/app/showImage/weitaomi3333.png";
+                String imageUrl = "/article/showImage/justForTest00001.png";
+                Map map=new HashMap();
+                map.put("x-gmkerl-exif-switch",true);
+                map.put("x-gmkerl-exif-switch",true);
                 boolean flag = upYun.writeFile(imageUrl, bytes);
                 System.out.println("=============> Is success? " + imageUrl);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-        }
     }
 }

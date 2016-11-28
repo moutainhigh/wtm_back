@@ -33,13 +33,13 @@
         <property name="jobDetail" ref="testJobDetail"/>
         <property name="cronExpression" value="0 */10 * * * ?"/><!-- 每隔10分钟触发一次 -->
     </bean>
-    <bean id="updateScoreTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-        <property name="jobDetail" ref="updateScoreDetail"/>
-        <property name="cronExpression" value="0 0 3 * * ?"/><!-- 每天凌晨3点触发一次 -->
-    </bean>
     <bean id="twoOclockTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="twoOclockTaskDetail"/>
         <property name="cronExpression" value="0 0 2 * * ?"/><!-- 每天凌晨2点触发一次 -->
+    </bean>
+    <bean id="updateScoreTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="updateScoreDetail"/>
+        <property name="cronExpression" value="0 0 3 * * ?"/><!-- 每天凌晨3点触发一次 -->
     </bean>
     <bean id="fourOclockRecordTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="deleteUnusefulRecordDetail"/>

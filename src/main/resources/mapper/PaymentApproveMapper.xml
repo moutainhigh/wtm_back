@@ -11,6 +11,7 @@
     <result column="accountNumber" property="accountNumber" jdbcType="VARCHAR" />
     <result column="accountName" property="accountName" jdbcType="VARCHAR" />
     <result column="amount" property="amount" jdbcType="DECIMAL" />
+    <result column="extraAmount" property="extraAmount" jdbcType="DECIMAL" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
     <result column="isPaid" property="isPaid" jdbcType="INTEGER" />
     <result column="createTime" property="createTime" jdbcType="BIGINT" />

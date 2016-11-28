@@ -1,6 +1,7 @@
 package com.weitaomi.application.model.mapper;
 
 import com.weitaomi.application.model.bean.MemberTaskHistory;
+import com.weitaomi.application.model.dto.MemberTaskHistoryInformation;
 import com.weitaomi.application.model.dto.MemberTaskWithDetail;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;
@@ -15,4 +16,5 @@ public interface MemberTaskHistoryMapper extends IBaseMapper<MemberTaskHistory> 
     int deleteUnfinishedTaskDetail(@Param("time") Integer time);
     int deleteUselessRecord(@Param("time") Long time);
     int deleteUselessRecordDetail(@Param("time") Long time);
+    List<MemberTaskHistoryInformation> getMemberTaskHistoryInformation(@Param("memberId") Long memberId, @Param("rowBounds") RowBounds rowBounds);
 }

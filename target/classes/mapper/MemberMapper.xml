@@ -159,4 +159,28 @@
   <select id="getIsBindWxAccountsByMemberName" resultType="java.lang.Integer">
     select count(*) from wtm_member m LEFT JOIN wtm_third_login login ON login.memberId=m.id WHERE m.memberName=#{memberName} AND login.sourceType=#{sourceType};
   </select>
+  <select id="getMemberSearchInformation"
+          resultType="com.weitaomi.application.model.dto.MemberSearchInformation">
+    select m.memberId,m.memberName,login.nickname nickName,m.telephone,m.sex,concat(m.province,m.city,m.area,m.memberAddress) address,
+    m.invitedCode inviteCode,m.createTime createTime,CASE m.sex WHEN 3 THEN 1 ELSE 0 END AS isForbidden
+    from wtm_member m LEFT JOIN wtm_third_login login ON login.memberId=m.id WHERE 1=1
+    <if test="memberSearch.memberId!=null">
+      AND m.memberId =#{memberSearch.memberId}
+    </if>
+    <if test="memberSearch.memberName!=null">
+      AND m.memberName LIKE concat('%',#{memberSearch.memberName},'%')
+    </if>
+    <if test="memberSearch.nickName!=null">
+      AND login.nickname LIKE concat('%',#{memberSearch.nickName},'%')
+    </if>
+    <if test="memberSearch.telephone!=null">
+      AND m.telephone = #{memberSearch.telephone}
+    </if>
+    <if test="memberSearch.registerStartTime!=null">
+      AND m.createTime > #{memberSearch.registerStartTime}
+    </if>
+    <if test="memberSearch.registerEndTime!=null">
+      AND m.createTime &lt; #{memberSearch.registerEndTime}
+    </if> group By m.id
+  </select>
 </mapper>
