@@ -161,7 +161,7 @@
   </select>
   <select id="getMemberSearchInformation"
           resultType="com.weitaomi.application.model.dto.MemberSearchInformation">
-    select m.memberId,m.memberName,login.nickname nickName,m.telephone,m.sex,concat(m.province,m.city,m.area,m.memberAddress) address,
+    select m.id,m.memberName,login.nickname nickName,m.telephone,m.sex,concat(m.province,m.city,m.area,m.memberAddress) address,
     m.invitedCode inviteCode,m.createTime createTime,CASE m.sex WHEN 3 THEN 1 ELSE 0 END AS isForbidden
     from wtm_member m LEFT JOIN wtm_third_login login ON login.memberId=m.id WHERE 1=1
     <if test="memberSearch.memberId!=null">
