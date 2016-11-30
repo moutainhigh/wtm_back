@@ -20,6 +20,7 @@
     <result column="officialAccountsId" property="officialAccountsId" jdbcType="BIGINT" />
     <result column="articleId" property="articleId" jdbcType="BIGINT" />
     <result column="needNumber" property="needNumber" jdbcType="INTEGER" />
+    <result column="realityNumber" property="realityNumber" jdbcType="INTEGER" />
     <result column="createTime" property="createTime" jdbcType="BIGINT" />
   </resultMap>
   <update id="updateTaskPoolWithScore">
@@ -28,6 +29,12 @@
   <update id="patchCheckArticle">
     update wtm_task_pool pool set pool.isPublishNow  = 1 where pool.id IN
     <foreach collection="poolIdList" item="item" open="(" close=")" separator=",">
+      #{item}
+    </foreach>
+  </update>
+  <update id="updateReturnBackTask">
+    update wtm_task_pool pool set pool.realityNumber  = pool.needNumber where pool.id IN
+    <foreach collection="idList" item="item" open="(" close=")" separator=",">
       #{item}
     </foreach>
   </update>
@@ -56,5 +63,10 @@
     select a.url,a.imageUrl,a.title,a.articleAbstract,a.createTime,pool.id poolId
     from wtm_article a LEFT JOIN wtm_task_pool pool ON pool.articleId = a.id
     WHERE pool.isPublishNow=0 AND pool.totalScore>=pool.singleScore AND pool.totalScore>0 AND pool.id>0
+  </select>
+  <select id="getReturnBackScoreToSeller" resultType="com.weitaomi.application.model.dto.TaskPoolReturnBack">
+    select a.memberId,pool.id taskPoolId,pool.singleScore,pool.needNumber,pool.realityNumber,pool.rate,a.userName username
+    from wtm_task_pool pool LEFT JOIN wtm_official_accounts a ON a.id=pool.officialAccountsId
+     WHERE pool.totalScore=0 AND pool.needNumber > pool.realityNumber AND pool.taskType=0
   </select>
 </mapper>

@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.weitaomi.application.model.bean.*;
 import com.weitaomi.application.model.dto.MemberTaskDto;
 import com.weitaomi.application.model.dto.MemberTaskWithDetail;
+import com.weitaomi.application.model.dto.TaskPoolReturnBack;
 import com.weitaomi.application.model.mapper.*;
 import com.weitaomi.application.service.interf.ICacheService;
 import com.weitaomi.application.service.interf.IMemberScoreService;
@@ -26,6 +27,7 @@ import org.springframework.util.Base64Utils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +58,8 @@ public class MemberTaskHistoryService implements IMemberTaskHistoryService {
     private ICacheService cacheService;
     @Autowired
     private OfficalAccountMapper officalAccountMapper;
+    @Autowired
+    private TaskPoolMapper taskPoolMapper;
 
     @Override
     public Page<MemberTaskWithDetail> getMemberTaskInfo(Long memberId, Integer type, Integer pageSize, Integer pageIndex) {
@@ -157,5 +161,23 @@ public class MemberTaskHistoryService implements IMemberTaskHistoryService {
         Integer number1 = memberTaskHistoryMapper.deleteUselessRecord(7*24*60*60L);
         Integer number2 = memberTaskHistoryMapper.deleteUselessRecordDetail(7*24*60*60L);
         logger.info("统一处理七天前无用的任务记录" + number1 + "条，任务详情" +number2+ "条");
+        this.returnBackScoreToSeller();
+    }
+
+    private Integer returnBackScoreToSeller(){
+        this.deleteUnFinishedTask();
+        List<TaskPoolReturnBack> taskPoolList=taskPoolMapper.getReturnBackScoreToSeller();
+        List<Long> idList=new ArrayList<>();
+        for (TaskPoolReturnBack taskPool:taskPoolList){
+            Integer number=taskPool.getNeedNumber()-taskPool.getRealityNumber();
+            Double returnScore= BigDecimal.valueOf(number).multiply(BigDecimal.valueOf(taskPool.getSingleScore())).doubleValue();
+            memberScoreService.addMemberScore(taskPool.getMemberId(),19L,1,returnScore,UUIDGenerator.generate());
+            this.addMemberTaskToHistory(taskPool.getMemberId(),15L,returnScore,1,"用户领取公众号："+taskPool.getUsername()+",未在规定时间内完成任务，米币统一返回给公众号商家",null,null);
+            idList.add(taskPool.getTaskPoolId());
+        }
+        if (!idList.isEmpty()) {
+            taskPoolMapper.updateReturnBackTask(idList);
+        }
+        return 0;
     }
 }

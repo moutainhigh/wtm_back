@@ -5,6 +5,7 @@ import com.weitaomi.application.model.bean.TaskPool;
 import com.weitaomi.application.model.dto.ArticleSearch;
 import com.weitaomi.application.model.dto.ArticleShowDto;
 import com.weitaomi.application.model.dto.TaskPoolDto;
+import com.weitaomi.application.model.dto.TaskPoolReturnBack;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;
 
@@ -19,4 +20,6 @@ public interface TaskPoolMapper extends IBaseMapper<TaskPool> {
     List<TaskPoolDto> getTaskPoolArticleDto(@Param("officialAccount") Long officialAccount, @Param("rowBounds") RowBounds rowBounds);
     List<TaskPoolDto> getTaskPoolAccountDto(@Param("officialAccount") Long officialAccount, @Param("rowBounds") RowBounds rowBounds);
     int patchCheckArticle(@Param("poolIdList") List<Long> poolIdList);
+    List<TaskPoolReturnBack> getReturnBackScoreToSeller();
+    Integer updateReturnBackTask(@Param("idList") List<Long> idList);
 }
