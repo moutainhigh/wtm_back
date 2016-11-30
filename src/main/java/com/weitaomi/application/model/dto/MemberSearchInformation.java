@@ -33,6 +33,10 @@ public class MemberSearchInformation {
      */
     private String inviteCode;
     /**
+     * 用户来源
+     */
+    private String source;
+    /**
      * 注册时间
      */
     private Long createTime;
@@ -183,5 +187,21 @@ public class MemberSearchInformation {
      */
     public void setNickName(String nickName) {
         this.nickName = nickName;
+    }
+
+    /**
+     * 获取用户来源
+     * @return source 用户来源
+     */
+    public String getSource() {
+        return this.source;
+    }
+
+    /**
+     * 设置用户来源
+     * @param source 用户来源
+     */
+    public void setSource(String source) {
+        this.source = source;
     }
 }
