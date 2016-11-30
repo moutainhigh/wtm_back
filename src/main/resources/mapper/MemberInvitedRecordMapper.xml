@@ -39,6 +39,6 @@
     </select>
     <select id="getMemberInvitedRecordInformation"
             resultType="com.weitaomi.application.model.dto.MemberInvitedRecordInformation">
-        select r.parentId,r.memberId,m.memberName invitedName,r.createTime,r.isAccessForInvitor from wtm_member_invited_record r LEFT JOIN wtm_member m ON m.id=r.memberId WHERE r.parentId=#{memberId};
+        select r.parentId,r.memberId,m.memberName invitedName,r.createTime,r.isAccessForInvitor from wtm_member_invited_record r LEFT JOIN wtm_member m ON m.id=r.memberId WHERE r.parentId=#{memberId} order by r.createTime desc
     </select>
 </mapper>

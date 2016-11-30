@@ -109,10 +109,9 @@ public class BackPageService extends BaseService implements IBackPageService {
         PageInfo<MemberTaskHistoryInformation> pageInfo=new PageInfo<MemberTaskHistoryInformation>(memberTaskHistoryInformations);
         return Page.trans(pageInfo);
     }
-    private Page<MemberTaskHistoryInformation> getOfficialAccountList(Long memberId){
+    private List<OfficialAccount> getOfficialAccountList(Long memberId){
         List<OfficialAccount> officialAccountList=officalAccountMapper.getOfficialAccountList(memberId);
-        PageInfo<OfficialAccount> pageInfo=new PageInfo<OfficialAccount>(officialAccountList);
-        return Page.trans(pageInfo);
+        return officialAccountList.isEmpty()?null:officialAccountList;
     }
     private Page<MemberInvitedRecordInformation> getMemberInvitedRecordInformation(Long memberId,Integer pageIndex,Integer pageSize){
         List<MemberInvitedRecordInformation> memberInvitedRecordInformations=memberInvitedRecordMapper.getMemberInvitedRecordInformation(memberId,new RowBounds(pageIndex,pageSize));

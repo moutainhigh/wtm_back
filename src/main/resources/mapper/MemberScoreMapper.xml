@@ -82,7 +82,7 @@
     </select>
     <select id="getMemberScoreInformation"
             resultType="com.weitaomi.application.model.dto.MemberScoreInformation">
-        select score.memberScore,score.avaliableScore avaliableScore,score.rechargeCurrentScore currentChargeScore,score.rechargeTotalScore totalChargeScore,
+        select score.memberScore totalScore,score.avaliableScore avaliableScore,score.rechargeCurrentScore currentChargeScore,score.rechargeTotalScore totalChargeScore,
         (select sum(m.addRewarScore) from wtm_office_member m WHERE m.memberId=#{memberId} and m.isAccessNow=1 AND m.isScoreAccess=0) futureAvaliableFollowScore,
         (select count(r.id)*50 from wtm_member_invited_record r where r.parentId=#{memberId} AND r.isAccessForInvitor=0) futureAvaliableInvitedScore
          from wtm_member_score score WHERE score.memberId=#{memberId};
