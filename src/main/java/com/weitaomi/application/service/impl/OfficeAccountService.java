@@ -221,10 +221,4 @@ public class OfficeAccountService implements IOfficeAccountService {
             logger.info("定时任务执行陈宫，执行结果为："+flag);
         }
     }
-
-
-    @Override
-    public List<OfficialAccount> getOfficialAccountList(Long memberId) {
-        return officalAccountMapper.getOfficialAccountList(memberId);
-    }
 }

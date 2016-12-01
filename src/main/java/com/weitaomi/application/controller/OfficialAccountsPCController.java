@@ -29,17 +29,6 @@ public class OfficialAccountsPCController extends BaseController{
     private ThirdLoginMapper thirdLoginMapper;
 
     /**
-     * 获取公众号列表
-     * @param
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping(value = "/getOfficialAccountList",method = RequestMethod.POST)
-    public AjaxResult getOfficialAccountList(HttpServletRequest request){
-        Long memberId=super.getUserId(request);
-        return AjaxResult.getOK(officeAccountService.getOfficialAccountList(memberId));
-    }
-    /**
      * 获取公众号任务管理列表
      * @param officialAccountId
      * @param type

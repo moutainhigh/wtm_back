@@ -228,7 +228,7 @@ public class MyBatisTest extends BaseContextCase {
     }
     @Test
     public void testMemberScoreMapper(){
-        memberTaskHistoryService.fourOclockScheduledJob();
+        memberTaskHistoryService.deleteUnFinishedTask();
     }
 }
 

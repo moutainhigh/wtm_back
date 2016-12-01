@@ -27,4 +27,8 @@
   <select id="getToalFlowScore" resultType="java.lang.Double">
     select sum(flow.flowScore) from wtm_member_score_flow flow where flow.memberScoreId=#{memberScoreId}
   </select>
+  <select id="getMemberScoreFlowInformation"
+          resultType="com.weitaomi.application.model.dto.MemberScoreFlowInformation">
+    select t.typeName typeName,t.typeDesc typeDesc,flow.memberScoreBefore,flow.flowScore,flow.memberScoreAfter,flow.createTime,flow.isFinished from wtm_member_score_flow flow LEFT JOIN wtm_member_score_flow_type t ON t.id=flow.typeId WHERE flow.memberId=#{memberId} order by flow.createTime desc
+  </select>
 </mapper>

@@ -23,12 +23,4 @@ public interface IOfficeAccountService {
     void taskFailPushToWechat();
 
     void taskFailToAckAddRequest();
-
-    /**
-     * 获取商户公众号列表
-     * @param memberId
-     * @return
-     */
-    public List<OfficialAccount> getOfficialAccountList(Long memberId);
-
 }

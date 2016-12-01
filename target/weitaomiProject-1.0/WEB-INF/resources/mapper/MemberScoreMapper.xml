@@ -80,4 +80,11 @@
                     wtm_member_score_flow f ON f.memberScoreId=s.id
                     WHERE s.memberId=#{memberId} AND f.createTime &lt; unix_timestamp(now()) AND f.createTime > #{time} AND f.typeId=7 AND f.flowScore &lt; 0) m
     </select>
+    <select id="getMemberScoreInformation"
+            resultType="com.weitaomi.application.model.dto.MemberScoreInformation">
+        select score.memberScore totalScore,score.avaliableScore avaliableScore,score.rechargeCurrentScore currentChargeScore,score.rechargeTotalScore totalChargeScore,
+        (select sum(m.addRewarScore) from wtm_office_member m WHERE m.memberId=#{memberId} and m.isAccessNow=1 AND m.isScoreAccess=0) futureAvaliableFollowScore,
+        (select count(r.id)*50 from wtm_member_invited_record r where r.parentId=#{memberId} AND r.isAccessForInvitor=0) futureAvaliableInvitedScore
+         from wtm_member_score score WHERE score.memberId=#{memberId};
+    </select>
 </mapper>

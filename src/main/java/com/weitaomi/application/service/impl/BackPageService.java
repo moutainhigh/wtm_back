@@ -84,7 +84,7 @@ public class BackPageService extends BaseService implements IBackPageService {
             case 1:params=this.getMemberScoreInformation(memberId);break;
             case 2:params=this.getMemberScoreFlowInformation(memberId, pageIndex, pageSize);break;
             case 3:params=this.getMemberTaskHistoryInformation(memberId, pageIndex, pageSize);break;
-            case 4:params=this.getOfficialAccountList(memberId);break;
+            case 4:params=this.getOfficialAccountList(memberId, pageIndex, pageSize);break;
             case 5:params=this.getMemberInvitedRecordInformation(memberId, pageIndex, pageSize);
         }
         return params;
@@ -109,9 +109,10 @@ public class BackPageService extends BaseService implements IBackPageService {
         PageInfo<MemberTaskHistoryInformation> pageInfo=new PageInfo<MemberTaskHistoryInformation>(memberTaskHistoryInformations);
         return Page.trans(pageInfo);
     }
-    private List<OfficialAccount> getOfficialAccountList(Long memberId){
-        List<OfficialAccount> officialAccountList=officalAccountMapper.getOfficialAccountList(memberId);
-        return officialAccountList.isEmpty()?null:officialAccountList;
+    private Page<OfficialAccount> getOfficialAccountList(Long memberId,Integer pageIndex,Integer pageSize){
+        List<OfficialAccount> officialAccountList=officalAccountMapper.getOfficialAccountList(memberId,new RowBounds(pageIndex,pageSize));
+        PageInfo<OfficialAccount> pageInfo=new PageInfo<OfficialAccount>(officialAccountList);
+        return Page.trans(pageInfo);
     }
     private Page<MemberInvitedRecordInformation> getMemberInvitedRecordInformation(Long memberId,Integer pageIndex,Integer pageSize){
         List<MemberInvitedRecordInformation> memberInvitedRecordInformations=memberInvitedRecordMapper.getMemberInvitedRecordInformation(memberId,new RowBounds(pageIndex,pageSize));

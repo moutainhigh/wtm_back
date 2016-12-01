@@ -219,14 +219,8 @@ public class MemberScoreService implements IMemberScoreService {
         String tableName="member:extra:reward";
         Set<String> keys=cacheService.getAllKeysFromHashTable(tableName);
         List<RewardCountDto> rewardCountDtoList=cacheService.getFromHashTable(tableName,new ArrayList<String>(keys));
-        ExecutorService executorService= Executors.newFixedThreadPool(10);
-        for (final RewardCountDto rewardCountDto:rewardCountDtoList){
-            executorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    dealUpdateExtraReward(rewardCountDto);
-                }
-            });
+        for (RewardCountDto rewardCountDto:rewardCountDtoList){
+            dealUpdateExtraReward(rewardCountDto);
         }
         cacheService.delKeyFromRedis(tableName);
         return rewardCountDtoList.size();
@@ -237,13 +231,16 @@ public class MemberScoreService implements IMemberScoreService {
         //todo  时间灵活修改
         List<OfficialAddAvaliableScore> officialAddAvaliableScoreList = officeMemberMapper.getOfficialAddAvaliableScoreList(7*24*60*60L);
         List<Long> idList=new ArrayList<>();
-        for (OfficialAddAvaliableScore officialAddAvaliableScore : officialAddAvaliableScoreList){
-            MemberScore memberScore= this.addMemberScore(officialAddAvaliableScore.getMemberId(),17L,1,officialAddAvaliableScore.getScore(), UUIDGenerator.generate());
-            if (memberScore!=null) {
-                idList.add(officialAddAvaliableScore.getId());
+        Integer number=0;
+        if (!officialAddAvaliableScoreList.isEmpty()) {
+            for (OfficialAddAvaliableScore officialAddAvaliableScore : officialAddAvaliableScoreList) {
+                MemberScore memberScore = this.addMemberScore(officialAddAvaliableScore.getMemberId(), 17L, 1, officialAddAvaliableScore.getScore(), UUIDGenerator.generate());
+                if (memberScore != null) {
+                    idList.add(officialAddAvaliableScore.getId());
+                }
             }
+             number = officeMemberMapper.updateOfficialMemberForAvaliable(idList);
         }
-        Integer number = officeMemberMapper.updateOfficialMemberForAvaliable(idList);
         return number;
     }
     private void dealUpdateExtraReward(RewardCountDto rewardCountDto){
