@@ -3,39 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>微淘米后台管理系统</title>
-    <link rel="shortcut icon" href="../../code/img/wtm.ico"/>
+    <link rel="shortcut icon" href="http://weitaomi.b0.upaiyun.com/common/pcback/wtm1480143185357.ico"/>
     <link href="../../code/css/backcommon.css" rel="stylesheet" type="text/css"/>
-    <script src="../../code/js/backmanage/backcommon.js"></script>
-    <script src="../../code/js/backmanage/withdraw.js"></script>
-    <script src="../../code/js/page.js"></script>
-    <script>
-        var checkTotal=0;
-        var pageSize=10;
-        $(function (){
-            var pageIndex=1;
-            getApproveList(pageIndex,pageSize);
-            var pagecount=Math.ceil(checkTotal/pageSize);
-            $(".tcdPageCode").createPage({
-                pageCount:pagecount,
-                current:pageIndex,
-                backFn:function(p){
-                    console.log("当前页是第"+p+"页");
-                    getApproveList(p,pageSize);
-                    allChecked();
-                }
-            });
-            console.log("页码总数是"+checkTotal);
-            allChecked();
-            $("#btn").click(function () {
-                batchReview();
-            });
-            $("#withdrawApproveList").click(function () {
-                getApproveList(1,pageSize);
-                allChecked();
-            })
-        })
-
-    </script>
 </head>
 <body>
 <header>
@@ -65,5 +34,13 @@
         </div>
     </article>
 </div>
+<script src="../../code/js/backmanage/backcommon.js"></script>
+<script src="../../code/js/backmanage/withdraw.js"></script>
+<script src="../../code/js/page.js"></script>
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
 </body>
 </html>

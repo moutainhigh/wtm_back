@@ -6,44 +6,9 @@
     <meta content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0" name="viewport" />
     <meta name="format-detection" content="telephone=no">
     <meta name="HandheldFriendly" content="true">
-    <link rel="shortcut icon" href="../../code/img/wtm.ico"/>
+    <link rel="shortcut icon" href="http://weitaomi.b0.upaiyun.com/common/pcback/wtm1480143185357.ico"/>
     <title>微淘米后台登录页面</title>
     <link href="../../code/css/backcommon.css" rel="stylesheet" type="text/css"/>
-    <script src="../../code/js/backmanage/backcommon.js"></script>
-    <script type="text/javascript" src="../../code/js/pcjs/login.js"></script>
-    <script>
-        $(function(){
-//            (function (doc, win) {
-//                var docEl = doc.documentElement,
-//                        resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
-//                        recalc = function () {
-//                            var clientWidth = docEl.clientWidth;
-//                            alert("第一个宽度是"+clientWidth);
-//                            if (!clientWidth) return;
-//                            docEl.style.fontSize = 20 * (clientWidth / 320) + 'px';
-//                            alert(docEl.style.fontSize);
-//                        };
-//                if (!doc.addEventListener) return;
-//                win.addEventListener(resizeEvt, recalc, false);
-//                doc.addEventListener('DOMContentLoaded', recalc, false);
-//            })(document, window);
-            var wheight=$(document).height();
-            $(".bnbody").css("height",wheight);
-            console.log(wheight);
-            var loginheight=$(".loginbg").height();
-            console.log(loginheight);
-            $(".bnbody").css("padding-top",(wheight-loginheight)/2);
-            var wwidth=$(window).width();
-            console.log("宽度是"+wwidth);
-            var loginwidth=$(".loginbg").width();
-            console.log("宽度是"+loginwidth);
-            if(wwidth<1080){
-                $(".loginbg").css("margin-left",(wwidth-loginwidth)/2.6);
-            }else {
-                $(".loginbg").css("margin-left",(wwidth-loginwidth)/2);
-            }
-        })
-    </script>
 </head>
 <body>
 <div class="bnbody">
@@ -56,10 +21,17 @@
                 <form Autocomplete="Off">
                     <input type="text" name="memberName" id="memberName" value="" placeholder="请输入用户名" autofocus>
                     <input type="password" name="password" id="password" value="" placeholder="请输入密码">
-                    <input class="loginbutton" type="button" value="登录"/>
                 </form>
+                <input class="loginbutton" type="button" value="登录"/>
             </div>
         </div>
 </div>
+<script src="../../code/js/backmanage/backcommon.js"></script>
+<script type="text/javascript" src="../../code/js/backmanage/login.js"></script>
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
 </body>
 </html>

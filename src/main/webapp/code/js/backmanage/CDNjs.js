@@ -2,6 +2,9 @@
  * Created by Administrator on 2016/11/22.
  */
 $(function(){
+    $(".uploadfile").click(function(){
+        loadupyun();
+    })
     //声明一级目录
     var onemenu = ["wap", "pc", "back", "common","app/version"]; //直接声明Array
 //声明二级目录

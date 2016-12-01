@@ -1,6 +1,31 @@
 /**
  * Created by Administrator on 2016/11/5.
  */
+var checkTotal=0;
+var pageSize=10;
+$(function (){
+    var pageIndex=1;
+    getApproveList(pageIndex,pageSize);
+    var pagecount=Math.ceil(checkTotal/pageSize);
+    $(".tcdPageCode").createPage({
+        pageCount:pagecount,
+        current:pageIndex,
+        backFn:function(p){
+            console.log("当前页是第"+p+"页");
+            getApproveList(p,pageSize);
+            allChecked();
+        }
+    });
+    console.log("页码总数是"+checkTotal);
+    allChecked();
+    $("#btn").click(function () {
+        batchReview();
+    });
+    $("#withdrawApproveList").click(function () {
+        getApproveList(1,pageSize);
+        allChecked();
+    })
+})
 var approveHead = ' <li class="nobd" id="total">' +
     '<div class="col-xs-1"><label class="col-xs-12"><input class="totalcleck" type="checkbox" value="全选"/>全选</label></div>' +
     '<div class="col-xs-1">提现方式</div>' +
