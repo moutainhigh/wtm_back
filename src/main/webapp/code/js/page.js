@@ -15,7 +15,6 @@
             return (function(){
                 obj.empty();
                 //涓婁竴椤�
-
                 if(args.current > 1){
                     obj.append('<a href="javascript:;" class="start">首页</a>');
                     obj.append('<a href="javascript:;" class="prevPage">&lt</a>');
@@ -122,8 +121,8 @@
     }
     $.fn.createPage = function(options){
         var args = $.extend({
-            pageCount : 10,
-            current : 1,
+            pageCount : "",
+            current : "",
             backFn : function(){}
         },options);
         ms.init(this,args);

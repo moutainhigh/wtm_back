@@ -18,7 +18,7 @@ $(function(){
         return add0(y) + '-' +add0(m) + '-' + add0(d) + ' ' + add0(h) + ':' + add0(mm);
     }
     $("#startime").attr("value","2016-9-01 10:00");
-    $("#endtime").attr("value",getNowEndDate());
+    $("#endtime").attr("value","2016-11-01 10:00");
     var startdateStr=$("#startime").val();
     var enddateStr=$("#endtime").val();
     //页面初始化用户信息
@@ -70,7 +70,6 @@ $(function(){
 });
 
 function GetConfirmUserInfor(obj){
-    //$(".referusercont").click(function(){
     var queryclassfun=$("#queryclass").get(0).selectedIndex;
     if(queryclassfun==4){
         var readOfficial=$(".readOreye").get(0).selectedIndex;
@@ -222,7 +221,6 @@ function userScoreTitle(name){
     document.getElementsByName(name)[0].appendChild(li);
 }
 function userScoreCont(name,data){
-    //$(".referusercont").remove();
     var li=document.createElement('li');li.className="referusercont";
     var div0=document.createElement('div'); div0.className="col-xs-1";
     if(data==null){div0.innerHTML="0";}else{div0.innerHTML=data.totalScore;}
@@ -300,27 +298,42 @@ function userContContent(name,data){
     var li=document.createElement('li');li.className="referusercont";
     var div0=document.createElement('div'); div0.className="col-xs-3";
     if(queryclassfun==3){if(data=="0"){div0.innerHTML="---";}else{div0.innerHTML=data.taskName;}}
-    else if(queryclassfun==4){if(data==null){div0.innerHTML="---";}else{div0.innerHTML=data.memberId;}}
     else if(queryclassfun==5){if(data=="0"){div0.innerHTML="---";}else{div0.innerHTML=data.memberId;}}
     var div1=document.createElement('div'); div1.className="col-xs-4";
     if(queryclassfun==3){if(data=="0"){div1.innerHTML="---";}else{div1.innerHTML=data.taskDesc;}}
-    else if(queryclassfun==4){if(data==null){div1.innerHTML="---";}else{div1.innerHTML=data.userName;}}
     else if(queryclassfun==5){if(data=="0"){div1.innerHTML="---";}else{
         if(data.invitedName==null){div1.innerHTML="---"}else{div1.innerHTML=data.invitedName;}}}
     var div2=document.createElement('div'); div2.className="col-xs-2";
     if(queryclassfun==3){if(data=="0"){div2.innerHTML="---";}else{div2.innerHTML=data.pointCount;}}
-    else if(queryclassfun==4){if(data==null){div2.innerHTML="---";}else{div2.innerHTML=data.originId;}}
     else if(queryclassfun==5){if(data=="0"){div2.innerHTML="---";}else{
         if(data.isAccessForInvitor==0){div2.innerHTML="否";}else{div2.innerHTML="是";}}}
     var div3=document.createElement('div'); div3.className="col-xs-3";
     if(queryclassfun==3){if(data=="0"){div3.innerHTML="---";}else{div3.innerHTML=getLocalTime(data.createTime);}}
-    else if(queryclassfun==4){if(data==null){div3.innerHTML="---";}else{div3.innerHTML=getLocalTime(data.createTime);}}
     else if(queryclassfun==5){if(data=="0"){div3.innerHTML="---";}else{div3.innerHTML=getLocalTime(data.createTime);}}
     li.appendChild(div0);li.appendChild(div1);li.appendChild(div2);li.appendChild(div3);
     document.getElementsByName(name)[0].insertBefore(li,PageCodeLi[0]);
 }
-function oficialdetaillisttitle(id){
-    var li=document.createElement('li');li.className="oficialconttitle";
+function oficialtitle(name,data){
+    var li1=document.createElement('li');li1.className="PageCodeList";var div11=document.createElement('div');
+    div11.className="PageCode";li1.appendChild(div11);
+    var PageCodeLi=document.getElementsByClassName("PageCodeLi");
+    var li=document.createElement('li');li.className="officialcont";li.setAttribute("name",data.originId);
+    var div=document.createElement('div'); div.className="col-xs-12 officialcount";div.setAttribute("name","0");
+    div.setAttribute("onClick","javaScirpt:getOfficialDetail(this)");
+    var div0=document.createElement('div'); div0.className="col-xs-3";
+    if(data=="0"){div0.innerHTML="---";}else{div0.innerHTML=data.memberId;}
+    var div1=document.createElement('div'); div1.className="col-xs-4";
+    if(data=="0"){div1.innerHTML="---";}else{div1.innerHTML=data.userName;}
+    var div2=document.createElement('div'); div2.className="col-xs-2";
+    if(data=="0"){div2.innerHTML="---";}else{div2.innerHTML=data.originId;}
+    var div3=document.createElement('div'); div3.className="col-xs-3";
+    if(data=="0"){div3.innerHTML="---";}else{div3.innerHTML=getLocalTime(data.createTime);}/*div3.innerHTML="创建时间";*/
+    li.appendChild(div);div.appendChild(div0);div.appendChild(div1);div.appendChild(div2);div.appendChild(div3);
+    document.getElementsByName(name)[0].appendChild(li1);
+    document.getElementsByName(name)[0].insertBefore(li,PageCodeLi[0]);
+}
+function oficialdetailtitle(name){
+    var li=document.createElement('li');li.className="col-xs-12 oficialconttitle";
     var div0=document.createElement('div'); div0.className="col-xs-2"; div0.innerHTML="任务名称";
     var div1=document.createElement('div'); div1.className="col-xs-2";div1.innerHTML="任务情况";
     var div2=document.createElement('div'); div2.className="col-xs-1";div2.innerHTML="单个任务奖励";
@@ -333,10 +346,10 @@ function oficialdetaillisttitle(id){
     option1.innerHTML="关注";option2.innerHTML="阅读";select.appendChild(option1);select.appendChild(option2);div7.appendChild(select);
     li.appendChild(div0);li.appendChild(div1);li.appendChild(div2);li.appendChild(div3);li.appendChild(div4);
     li.appendChild(div5);li.appendChild(div6);li.appendChild(div7);
-    document.getElementById("oficialdetail"+id).appendChild(li);
+    document.getElementsByName(name)[0].appendChild(li);
 }
-function oficialdetaillistcont(id){
-    var li=document.createElement('li');li.className="oficialcontbody";
+function oficialdetailcont(name){
+    var li=document.createElement('li');li.className="col-xs-12 oficialcontbody";
     var div0=document.createElement('div'); div0.className="col-xs-2"; div0.innerHTML="关注公众号";
     var div1=document.createElement('div'); div1.className="col-xs-2";
     var label=document.createElement("label");var input1=document.createElement('input');
@@ -350,7 +363,7 @@ function oficialdetaillistcont(id){
     var div6=document.createElement('div'); div6.className="col-xs-2";div6.innerHTML="50";
     li.appendChild(div0);li.appendChild(div1);li.appendChild(div2);li.appendChild(div3);li.appendChild(div4);
     li.appendChild(div5);li.appendChild(div6);div1.appendChild(label);label.appendChild(input1);
-    document.getElementById("oficialdetail"+id).appendChild(li);
+    document.getElementsByName(name)[0].appendChild(li);
 }
 //查询确定用户详细信息
 function confirmUserInforSearch(object){
@@ -369,32 +382,6 @@ function confirmUserInforSearch(object){
             GetPageInfor(memberId,flag,pageIndex,pageSize,object);
             var checkTotal=$(".PageCode").attr("name");
             console.log(checkTotal+"total");
-
-
-
-
-                //$(".refercont").click(function(){
-                //    var id=$(this).attr("id");
-                //    var oficialcount=parseInt($(this).attr("name"));
-                //    console.log(oficialcount);
-                //    if(oficialcount==0){
-                //        $("#oficialdetail"+id).empty();
-                //        //$("#oficialdetail"+id).css("min-height","100px");
-                //        oficialdetaillisttitle(id);
-                //        oficialdetaillistcont(id);
-                //        $(".readOreye").change(function(){
-                //            var readOreye=$(".readOreye").get(0).selectedIndex;
-                //        });
-                //        oficialcount++;
-                //        $(this).attr("name",oficialcount);
-                //    }else {
-                //        $("#oficialdetail"+id).empty();
-                //        oficialcount--;
-                //        $(this).attr("name",oficialcount);
-                //        console.log(oficialcount+"fff");
-                //    }
-                //
-                //});
         }
 }else {
     object.setAttribute("name","0");
@@ -414,22 +401,37 @@ function GetPageInfor(memberId,flag,pageIndex,pageSize,object){
                     userScoreCont(memberId,json.data);
                 }else if(flag==2){
                     userFlowTitle(memberId);
-                    CreatePage(memberId,flag,pageIndex,pageSize,object,json.data.total);
+                    if(json.data.total>pageSize){
+                        CreatePage(memberId,flag,pageIndex,pageSize,object,json.data.total);
+                    }else {$(".PageCodeLi").css("display","none");}
                     if(json.data.total==0){
                         userFlowContent(memberId,"0");
                     }
                     json.data.list.forEach(function(e){
                         userFlowContent(memberId,e);
                     });
-                }else{
+                }
+                else{
                     userContTitle(memberId);
-                    CreatePage(memberId,flag,pageIndex,pageSize,object,json.data.total);
-                    if(json.data.total==0){
-                        userContContent(memberId,"0");
+                    if(json.data.total>pageSize){
+                        CreatePage(memberId,flag,pageIndex,pageSize,object,json.data.total);
+                    }else {$(".PageCodeLi").css("display","none");}
+                    if(flag==4){
+                        if(json.data.total==0){
+                            oficialtitle(memberId,"0");
+                        }
+                        json.data.list.forEach(function(e){
+                            oficialtitle(memberId,e);
+                        });
+                        $(".PageCodeList").css("display","none");
+                    }else{
+                        if(json.data.total==0){
+                            userContContent(memberId,"0");
+                        }
+                        json.data.list.forEach(function(e){
+                            userContContent(memberId,e);
+                        });
                     }
-                    json.data.list.forEach(function (e){
-                        userContContent(memberId,e);
-                    });
                 }
                 object.setAttribute("name","1");
             }
@@ -443,6 +445,30 @@ function GetPageInfor(memberId,flag,pageIndex,pageSize,object){
         }
     });
 }
+function getOfficialDetail(obj){
+    var originId=$(obj).children().eq(2).text();
+    var clickCount=obj.getAttribute("name");
+    $(obj.parentNode).siblings().children().remove("li");
+    $(obj.parentNode).siblings().children(".officialcount").attr("name","0");
+    if(clickCount==0){
+        //$.ajax({
+        //    type: 'post',
+        //    url: '/backward/getMemberInformation',
+        //    data:{memberId:memberId,flag:flag,pageIndex:pageIndex,pageSize:pageSize},
+        //    success: function (params) {
+        //
+        //    }
+        //})
+        oficialdetailtitle(originId);
+        var readOreye=$(".readOreye").get(0).selectedIndex;
+        oficialdetailcont(originId);
+        obj.setAttribute("name","1");
+    }else{
+        obj.setAttribute("name","0");
+        $(obj.parentNode).children().remove("li");
+    }
+}
+
 function CreatePage(memberId,flag,pageIndex,pageSize,object,checkTotal){
     var pageCount=Math.ceil(checkTotal/pageSize);
     $(".PageCode").createPage({
@@ -512,13 +538,3 @@ function get_unix_endtime(enddateStr)
     var time_str = date.getTime().toString();
     return time_str.substr(0, 10);
 }
-
-
-//function  a(){
-//    if (number>3){
-//        return
-//    }else {
-//        number++
-//        a()
-//    }
-//}
