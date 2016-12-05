@@ -89,7 +89,7 @@ public class PaymentService implements IPaymentService,Runnable {
 
     @Override
     @Transactional
-    public synchronized boolean dealWithdrawsChange(Map<String, Object> param) {
+    public boolean dealWithdrawsChange(Map<String, Object> param) {
         if (!param.isEmpty()) {
             String ip = param.get("ip").toString();
             Long approveId = Long.valueOf(param.get("approveId").toString());
@@ -104,125 +104,151 @@ public class PaymentService implements IPaymentService,Runnable {
             if (isApprove != null) {
                 if (isApprove == 1) {
                     Long amount = approve.getAmount().multiply(BigDecimal.valueOf(100)).longValue();
-                    String randomkey = UUIDGenerator.generate();
-                    String code = this.getTradeNo();
-                    Map<String, String> params = new HashMap<>();
-                    ThirdLogin thirdLogin = thirdLoginMapper.getThirdLoginByOpenId(approve.getAccountNumber());
-                    String key = "";
-                    if (thirdLogin.getSourceType() == 0) {
-                        params.put("mch_appid", WechatConfig.APP_ID);
-                        params.put("mchid", WechatConfig.MCHID);
-                        key = WechatConfig.API_KEY;
+                    MemberScoreFlow memberScoreFlow = memberScoreFlowMapper.getMemberScoreFlow(approve.getMemberId(), -approve.getAmount().add(approve.getExtraAmount()).multiply(BigDecimal.valueOf(100)).doubleValue(), approve.getCreateTime(), 2L, 0);
+                    if (memberScoreFlow == null) {
+                        throw new InfoException("获取待提现记录失败");
                     }
-                    if (thirdLogin.getSourceType() == 1) {
-                        params.put("mch_appid", WechatConfig.MCH_APPID);
-                        params.put("mchid", WechatConfig.MCHID_OFFICIAL);
-                        key = WechatConfig.OFFICIAL_API_KEY;
+                    MemberScore memberScore = memberScoreMapper.selectByPrimaryKey(memberScoreFlow.getMemberScoreId());
+                    if (memberScore == null) {
+                        throw new InfoException("获取用户积分总额失败");
                     }
-                    params.put("nonce_str", randomkey);
-                    params.put("partner_trade_no", code);
-                    params.put("openid", approve.getAccountNumber());
-                    params.put("check_name", "NO_CHECK");
-                    params.put("amount", amount.toString());
-                    params.put("desc", "付款到" + thirdLogin.getNickname() + "的账户");
-                    params.put("spbill_create_ip", ip);
-                    String pre_sign = StringUtil.formatParaMap(params);
-                    pre_sign = pre_sign + "&key=" + key;
-                    String sign = DigestUtils.md5Hex(pre_sign).toUpperCase();
-
-                    WechatBatchPayParams wechatBatchPayParams = new WechatBatchPayParams();
-                    wechatBatchPayParams.setAmount(amount.toString());
-                    wechatBatchPayParams.setCheck_name("NO_CHECK");
-                    wechatBatchPayParams.setDesc("付款到" + thirdLogin.getNickname() + "的账户");
-
-                    if (thirdLogin.getSourceType() == 0) {
-                        wechatBatchPayParams.setMch_appid(WechatConfig.APP_ID);
-                        wechatBatchPayParams.setMchid(WechatConfig.MCHID);
+                    String hash = "member:desposit:forOne:" + approve.getId();
+                    Integer flag = cacheService.getCacheByKey(hash.toString(), Integer.class);
+                    if (flag != null && flag == 1) {
+                        throw new InfoException("该条提现已经审核过");
                     }
-                    if (thirdLogin.getSourceType() == 1) {
-                        wechatBatchPayParams.setMch_appid(WechatConfig.MCH_APPID);
-                        wechatBatchPayParams.setMchid(WechatConfig.MCHID_OFFICIAL);
-                    }
-
-                    wechatBatchPayParams.setNonce_str(randomkey);
-                    wechatBatchPayParams.setOpenid(approve.getAccountNumber());
-                    wechatBatchPayParams.setPartner_trade_no(code);
-                    wechatBatchPayParams.setSign(sign);
-                    wechatBatchPayParams.setSpbill_create_ip(ip);
-                    XStream xStream = new XStream(new DomDriver("UTF-8", new XmlFriendlyNameCoder("-_", "_")));
-                    xStream.autodetectAnnotations(true);
-                    String xml = xStream.toXML(wechatBatchPayParams);
-                    try {
-                        String path = "";
+                    if (amount>0) {
+                        String randomkey = UUIDGenerator.generate();
+                        String code = this.getTradeNo();
+                        Map<String, String> params = new HashMap<>();
+                        ThirdLogin thirdLogin = thirdLoginMapper.getThirdLoginByOpenId(approve.getAccountNumber());
+                        String key = "";
                         if (thirdLogin.getSourceType() == 0) {
-                            path = certFilePath0;
+                            params.put("mch_appid", WechatConfig.APP_ID);
+                            params.put("mchid", WechatConfig.MCHID);
+                            key = WechatConfig.API_KEY;
                         }
                         if (thirdLogin.getSourceType() == 1) {
-                            path = certFilePath1;
+                            params.put("mch_appid", WechatConfig.MCH_APPID);
+                            params.put("mchid", WechatConfig.MCHID_OFFICIAL);
+                            key = WechatConfig.OFFICIAL_API_KEY;
                         }
-                        String result = ClientCustomSSL.connectKeyStore(WechatConfig.BATCH_PAY_URL, xml, path, thirdLogin.getSourceType());
-                        logger.info("审核结果为{}",result);
-                        WechatBatchPayResult wechat = StreamUtils.toBean(result, WechatBatchPayResult.class);
-                        if (wechat != null) {
-                            if (wechat.getResult_code().equals(WechatConfig.SUCCESS) && wechat.getReturn_code().equals(WechatConfig.SUCCESS)) {
-                                approve.setIsPaid(1);
-                                MemberScoreFlow memberScoreFlow = memberScoreFlowMapper.getMemberScoreFlow(approve.getMemberId(), -approve.getAmount().multiply(BigDecimal.valueOf(100)).doubleValue(), approve.getCreateTime(), 2L, 0);
-                                approve.setCreateTime(DateUtils.getUnixTimestamp());
-                                if (memberScoreFlow == null) {
-                                    throw new InfoException("获取待提现记录失败");
-                                }
-                                memberScoreFlow.setIsFinished(1);
-                                MemberScore memberScore = memberScoreMapper.selectByPrimaryKey(memberScoreFlow.getMemberScoreId());
-                                memberScore.setInValidScore(memberScore.getInValidScore().add(memberScoreFlow.getFlowScore()));
-                                memberScoreMapper.updateByPrimaryKeySelective(memberScore);
-                                memberScoreFlowMapper.updateByPrimaryKeySelective(memberScoreFlow);
-                                approveMapper.updateByPrimaryKeySelective(approve);
-                                PaymentHistory paymentHistory = new PaymentHistory();
-                                paymentHistory.setIsPaySuccess(1);
-                                paymentHistory.setPayType(1);
-                                paymentHistory.setParams(JSON.toJSONString(wechatBatchPayParams));
-                                paymentHistory.setMemberId(approve.getMemberId());
-                                paymentHistory.setPlatform(PayType.WECHAT_APP.getDesc());
-                                paymentHistory.setPayCode(code);
-                                paymentHistory.setCreateTime(DateUtils.getUnixTimestamp());
-                                paymentHistory.setBatchPayNo(wechat.getPayment_no());
-                                paymentHistory.setMemberId(approve.getMemberId());
-                                paymentHistoryList.add(paymentHistory);
-                                number++;
-                            } else {
-                                String reason = WechatResutCode.getValue(wechat.getErr_code()).getValue();
-                                Long memberId = (Long) param.get("memberId");
-                                String mobile = "13153212303";
-                                if (memberId != null) {
-                                    Member member = memberMapper.selectByPrimaryKey(memberId);
-                                    mobile = member.getTelephone();
-                                }
-                                SendMCUtils.sendMessage(mobile, MessageFormat.format(new String(PropertiesUtil.getValue("withdraws.fail.msg")), approveId, reason));
-                                return false;
+                        params.put("nonce_str", randomkey);
+                        params.put("partner_trade_no", code);
+                        params.put("openid", approve.getAccountNumber());
+                        params.put("check_name", "NO_CHECK");
+                        params.put("amount", amount.toString());
+                        params.put("desc", "付款到" + thirdLogin.getNickname() + "的账户");
+                        params.put("spbill_create_ip", ip);
+                        String pre_sign = StringUtil.formatParaMap(params);
+                        pre_sign = pre_sign + "&key=" + key;
+                        String sign = DigestUtils.md5Hex(pre_sign).toUpperCase();
+
+                        WechatBatchPayParams wechatBatchPayParams = new WechatBatchPayParams();
+                        wechatBatchPayParams.setAmount(amount.toString());
+                        wechatBatchPayParams.setCheck_name("NO_CHECK");
+                        wechatBatchPayParams.setDesc("付款到" + thirdLogin.getNickname() + "的账户");
+
+                        if (thirdLogin.getSourceType() == 0) {
+                            wechatBatchPayParams.setMch_appid(WechatConfig.APP_ID);
+                            wechatBatchPayParams.setMchid(WechatConfig.MCHID);
+                        }
+                        if (thirdLogin.getSourceType() == 1) {
+                            wechatBatchPayParams.setMch_appid(WechatConfig.MCH_APPID);
+                            wechatBatchPayParams.setMchid(WechatConfig.MCHID_OFFICIAL);
+                        }
+
+                        wechatBatchPayParams.setNonce_str(randomkey);
+                        wechatBatchPayParams.setOpenid(approve.getAccountNumber());
+                        wechatBatchPayParams.setPartner_trade_no(code);
+                        wechatBatchPayParams.setSign(sign);
+                        wechatBatchPayParams.setSpbill_create_ip(ip);
+                        XStream xStream = new XStream(new DomDriver("UTF-8", new XmlFriendlyNameCoder("-_", "_")));
+                        xStream.autodetectAnnotations(true);
+                        String xml = xStream.toXML(wechatBatchPayParams);
+                        try {
+                            String path = "";
+                            if (thirdLogin.getSourceType() == 0) {
+                                path = certFilePath0;
                             }
+                            if (thirdLogin.getSourceType() == 1) {
+                                path = certFilePath1;
+                            }
+                            String result = ClientCustomSSL.connectKeyStore(WechatConfig.BATCH_PAY_URL, xml, path, thirdLogin.getSourceType());
+                            logger.info("审核结果为{}", result);
+                            WechatBatchPayResult wechat = StreamUtils.toBean(result, WechatBatchPayResult.class);
+                            if (wechat != null) {
+                                if (wechat.getResult_code().equals(WechatConfig.SUCCESS) && wechat.getReturn_code().equals(WechatConfig.SUCCESS)) {
+                                    String hashCode = "member:desposit:forOne:" + approve.getId();
+                                    Long time = DateUtils.getTodayEndSeconds() - DateUtils.getUnixTimestamp();
+                                    cacheService.setCacheByKey(hashCode, 1, time.intValue());
+                                    approve.setIsPaid(1);
+                                    memberScoreFlow.setIsFinished(1);
+                                    memberScore.setInValidScore(memberScore.getInValidScore().add(memberScoreFlow.getFlowScore()));
+                                    memberScoreMapper.updateByPrimaryKeySelective(memberScore);
+                                    memberScoreFlowMapper.updateByPrimaryKeySelective(memberScoreFlow);
+                                    approve.setCreateTime(DateUtils.getUnixTimestamp());
+                                    approveMapper.updateByPrimaryKeySelective(approve);
+                                    PaymentHistory paymentHistory = new PaymentHistory();
+                                    paymentHistory.setIsPaySuccess(1);
+                                    paymentHistory.setPayType(1);
+                                    paymentHistory.setParams(JSON.toJSONString(wechatBatchPayParams));
+                                    paymentHistory.setMemberId(approve.getMemberId());
+                                    paymentHistory.setPlatform(PayType.WECHAT_APP.getDesc());
+                                    paymentHistory.setPayCode(code);
+                                    paymentHistory.setCreateTime(DateUtils.getUnixTimestamp());
+                                    paymentHistory.setBatchPayNo(wechat.getPayment_no());
+                                    paymentHistory.setMemberId(approve.getMemberId());
+                                    paymentHistoryList.add(paymentHistory);
+                                    number++;
+                                } else {
+                                    String reason = WechatResutCode.getValue(wechat.getErr_code()).getValue();
+                                    Long memberId = (Long) param.get("memberId");
+                                    String mobile = "13153212303";
+                                    if (memberId != null) {
+                                        Member member = memberMapper.selectByPrimaryKey(memberId);
+                                        mobile = member.getTelephone();
+                                    }
+                                    SendMCUtils.sendMessage(mobile, MessageFormat.format(new String(PropertiesUtil.getValue("withdraws.fail.msg")), approveId, reason));
+                                    return false;
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            return false;
                         }
-                    } catch (Exception e) {
-                       return false;
-                    }
-                    if (number == 1) {
-                        int num = paymentHistoryMapper.batchInsertPayHistory(paymentHistoryList);
-                        if (num == number) {
-                            try {
+                        if (number == 1) {
+                            int num = paymentHistoryMapper.batchInsertPayHistory(paymentHistoryList);
+                            if (num == number) {
+                                try {
 //                                JpushUtils.buildRequest("提现申请审核通过，请到微信查看零钱明细", approve.getMemberId());
-                            } catch (Exception e) {
-                                logger.info("发送审核结果通知失败");
-                            }
-                            return true;
-                        } else throw new InfoException("提现审核失败");
-                    } else {
-                        String mobile = "13105187050";
-                        SendMCUtils.sendMessage(mobile, MessageFormat.format(new String(PropertiesUtil.getValue("withdraws.fail.msg")), approveId, "获取用户记录失败"));
-                        return false;
+                                } catch (Exception e) {
+                                    logger.info("发送审核结果通知失败");
+                                }
+                                return true;
+                            } else throw new InfoException("提现审核失败");
+                        } else {
+                            String mobile = "13105187050";
+                            SendMCUtils.sendMessage(mobile, MessageFormat.format(new String(PropertiesUtil.getValue("withdraws.fail.msg")), approveId, "获取用户记录失败"));
+                            return false;
+                        }
+                    }else if (amount==0){
+                        String hashCode = "member:desposit:forOne:" + approve.getId();
+                        Long time = DateUtils.getTodayEndSeconds() - DateUtils.getUnixTimestamp();
+                        cacheService.setCacheByKey(hashCode, 1, time.intValue());
+                        approve.setIsPaid(1);
+                        memberScoreFlow.setIsFinished(1);
+                        memberScore.setInValidScore(memberScore.getInValidScore().add(memberScoreFlow.getFlowScore()));
+                        memberScoreMapper.updateByPrimaryKeySelective(memberScore);
+                        memberScoreFlowMapper.updateByPrimaryKeySelective(memberScoreFlow);
+                        approve.setCreateTime(DateUtils.getUnixTimestamp());
+                        approveMapper.updateByPrimaryKeySelective(approve);
                     }
                 } else if (isApprove == 0) {
-                    Double returnBackScore = approve.getAmount().multiply(BigDecimal.valueOf(100)).doubleValue();
-                    MemberScoreFlow memberScoreFlow = memberScoreFlowMapper.getMemberScoreFlow(approve.getMemberId(), -approve.getAmount().multiply(BigDecimal.valueOf(100)).doubleValue(), approve.getCreateTime(), 2L, 0);
+                    Double returnBackScore = approve.getAmount().add(approve.getExtraAmount()).multiply(BigDecimal.valueOf(100)).doubleValue();
+                    MemberScoreFlow memberScoreFlow = memberScoreFlowMapper.getMemberScoreFlow(approve.getMemberId(), -returnBackScore, approve.getCreateTime(), 2L, 0);
                     memberScoreFlow.setTypeId(8L);
+                    memberScoreFlow.setIsFinished(-1);
                     memberScoreFlowMapper.updateByPrimaryKeySelective(memberScoreFlow);
                     memberScoreService.addMemberScore(approve.getMemberId(), 8L, 1, returnBackScore, UUIDGenerator.generate());
                     taskHistoryService.addMemberTaskToHistory(approve.getMemberId(), 13L, returnBackScore, 1, null, null, null);

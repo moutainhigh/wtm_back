@@ -22,5 +22,7 @@ public interface IOfficeAccountService {
 
     void taskFailPushToWechat();
 
+    void sendRequestToWechatDialog(String unionId, List<Long> idList);
+
     void taskFailToAckAddRequest();
 }

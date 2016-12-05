@@ -1,17 +1,25 @@
 package com.weitaomi.systemconfig.listener;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.rabbitmq.client.Channel;
 import com.weitaomi.application.model.dto.AddResponseTaskDto;
 import com.weitaomi.application.service.interf.IOfficeAccountService;
+import com.weitaomi.systemconfig.util.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.ChannelAwareMessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by supumall on 2016/8/10.
  */
 public class AddOfficialAccountListener implements ChannelAwareMessageListener {
+    private Logger logger= LoggerFactory.getLogger(AddOfficialAccountListener.class);
     @Autowired
     private IOfficeAccountService officeAccountService;
     @Autowired
@@ -19,11 +27,14 @@ public class AddOfficialAccountListener implements ChannelAwareMessageListener {
     @Override
     public void onMessage(Message message, Channel channel) throws Exception {
         channel.basicQos(100);
-        String jsonParams=(String)messageConverter.fromMessage(message);
+        String data=(String)messageConverter.fromMessage(message);
+        Map params=(Map)JSONObject.parse(data);
+        List<Long> idList=(List<Long>)params.get("idList");
+        String unionId=(String)params.get("unionId");
+        logger.info("获取数据成功：{}", JSON.toJSONString(params));
         channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
-        AddResponseTaskDto addResponseTaskDto= JSONObject.parseObject(jsonParams,AddResponseTaskDto.class);
-        if (addResponseTaskDto!=null){
-//            officeAccountService.receiveAddOffical(addResponseTaskDto);
+        if (idList!=null&& !StringUtil.isEmpty(unionId)){
+            officeAccountService.sendRequestToWechatDialog(unionId,idList);
         }
     }
 }

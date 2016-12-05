@@ -9,6 +9,7 @@
     <result column="memberId" jdbcType="BIGINT" property="memberId" />
     <result column="parentId" jdbcType="BIGINT" property="parentId" />
     <result column="isAccessible" jdbcType="INTEGER" property="isAccessible" />
+    <result column="isAccessForInvitor" jdbcType="INTEGER" property="isAccessForInvitor" />
     <result column="createTime" jdbcType="BIGINT" property="createTime" />
   </resultMap>
   <select id="getMemberInvitedRecordByMemberId" resultType="com.weitaomi.application.model.bean.MemberInvitedRecord">
@@ -35,5 +36,9 @@
           LEFT JOIN wtm_member m ON m.id = h.memberId
         WHERE t.id IN (3, 7)
         GROUP BY h.memberId ORDER BY  shareCounts DESC,m.createTime ASC LIMIT 10
+    </select>
+    <select id="getMemberInvitedRecordInformation"
+            resultType="com.weitaomi.application.model.dto.MemberInvitedRecordInformation">
+        select r.parentId,r.memberId,m.memberName invitedName,r.createTime,r.isAccessForInvitor from wtm_member_invited_record r LEFT JOIN wtm_member m ON m.id=r.memberId WHERE r.parentId=#{memberId} order by r.createTime desc
     </select>
 </mapper>

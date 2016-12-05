@@ -205,7 +205,38 @@ public class OfficeAccountService implements IOfficeAccountService {
             }
         }
     }
-
+    @Override
+    public void sendRequestToWechatDialog(String unionId,List<Long> idList){
+        Long timeStart = System.currentTimeMillis();
+        String url = PropertiesUtil.getValue("server.officialAccount.receiveAddRequest.url");
+        Map<String, Object> map = new HashMap<>();
+        map.put("unionId", unionId);
+        map.put("officialAccountIdList", idList);
+        map.put("flag", "1");
+        Integer accountAdsId = accountAdsMapper.getLatestAccountAdsId();
+        if (accountAdsId != null) {
+            map.put("accountAdsId", accountAdsId);
+        }
+        try {
+            String result = HttpRequestUtils.postStringEntity(url, JSON.toJSONString(map));
+            if (!StringUtil.isEmpty(result)) {
+                Map<String, String> params = (Map<String, String>) JSONObject.parse(result);
+                boolean flag = Boolean.valueOf(params.get("temp"));
+                if (!flag) {
+                    TaskFailPushToWechat taskFailPushToWechat = new TaskFailPushToWechat();
+                    taskFailPushToWechat.setParams(JSON.toJSONString(map));
+                    taskFailPushToWechat.setPostUrl(url);
+                    taskFailPushToWechat.setType(0);
+                    taskFailPushToWechat.setIsPushToWechat(0);
+                    taskFailPushToWechat.setCreateTime(DateUtils.getUnixTimestamp());
+                    taskFailPushToWechatMapper.insertSelective(taskFailPushToWechat);
+                }
+            }
+            logger.info("领取关注任务列表时间：" + (System.currentTimeMillis() - timeStart));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     @Override
     public void taskFailToAckAddRequest() {
         List<Long> idList=new ArrayList<>();
