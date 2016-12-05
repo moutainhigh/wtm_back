@@ -3,7 +3,7 @@
  */
 $(function(){
     datepicker();/*初始化日期*/
-    headSearch();/*初始化用户信息*/
+    //headSearch();/*初始化用户信息*/
     $(".referbtn").click(function(){
         headSearch();
         queryClassChange();
@@ -21,18 +21,20 @@ function queryClassChange(){
 }//查询条件改变时重置点击效果
 function headSearch(){
     $(".tcdPageCode").children().remove();
+    var pageIndex=1;
+    var pageSize=20;
     var memberName=$("#usename").val();
     var memberId=$("#useId").val();
     var telephone=$("#usetel").val();
-    console.log(telephone);
     var nickName=$("#wechatname").val();
     var registerStartTime=get_unix_time($("#startime").val());
     var registerEndTime=get_unix_time($("#endtime").val());
-    var pageIndex=1;
-    var pageSize=30;
+    if($("#startime").val()==""){registerStartTime="1475193600"}
+    if($("#endtime").val()==""){registerEndTime=get_unix_time(getNowEndDate());}
     if(memberName==""){memberName=null}if(memberId==""){memberId=null}if(telephone==""){telephone=null}if(nickName==""){nickName=null}
     var obj=new UserInforCondi(memberName,nickName,telephone,memberId,registerStartTime,registerEndTime,pageIndex,pageSize);
     var requestObj = JSON.stringify(obj);
+    console.log(requestObj);
     userinforscoretitle();
     $(".refercont").remove();
     getMemberInformation(requestObj);
@@ -159,49 +161,57 @@ function GetPageInfor(memberId,flag,pageIndex,pageSize,object){
         }
     });
 }//查询确定用户详细信息请求
-function getOfficialDetail(obj){
+function getOfficialDetail(object){
     var pageIndex=1;
     var pageSize=10;
-    var originId=$(obj).children().eq(2).text();
-    var clickCount=obj.getAttribute("name");
-    $(obj.parentNode).siblings().children().remove("li");
-    $(obj.parentNode).siblings().children(".officialcount").attr("name","0");
-    var memberId=$(obj).children(":first").text();
-    console.log("第一个孩子memberId"+memberId)//flag=0表示“关注”，flag=1表示“阅读”
+    var id=$(object).children().eq(0).text();
+    var originId=$(object).children().eq(2).text();
+    var clickCount=object.getAttribute("name");
+    $(object.parentNode).siblings().children().remove("li");
+    $(object.parentNode).siblings().children(".officialcount").attr("name","0");
+    var memberId=$(object).children(":first").text();
     if(clickCount==0){
-        $.ajax({
-            type: 'post',
-            url: '/backward/getMemberInformationDetail',
-            data:{memberId:memberId,flag:"2",pageIndex:pageIndex,pageSize:pageSize},
-            success: function (params) {
-                var json = eval(params);
-                if (json.errorCode == 0){
-                    oficialdetailtitle(originId);
-                    var readOreye=$(".readOreye").get(0).selectedIndex;
-                    if(json.data.total>pageSize){
-                        CreatePage(memberId,flag,pageIndex,pageSize,object,json.data.total);
-                    }else {$(".PageCodeLi").css("display","none");}
-                    if(json.data.total==0){
-                        oficialdetailcont(originId,"0");
-                    }
-                    json.data.list.forEach(function(e){
-                        oficialdetailcont(originId,e);
-                    });
-                }else if(json.errorCode==4){
-                    alert(json.message);
-                }
-            },error:function(data){
-                alert("页面加载失败，请重新加载");
-            }
+        oficialdetailtitle(originId);
+        officialinforrequest(id,pageIndex,pageSize,object,memberId)
+        $(".readOreye").change(function(){
+            $(".oficialcontbody").remove();
+            officialinforrequest(id,pageIndex,pageSize,object,memberId)
         });
-        //oficialdetailcont(originId);
-        obj.setAttribute("name","1");
+        object.setAttribute("name","1");
     }else{
-        obj.setAttribute("name","0");
-        $(obj.parentNode).children().remove("li");
+        object.setAttribute("name","0");
+        $(object.parentNode).children().remove("li");
     }
 }//查询公众号信息请求
-
+function officialinforrequest(id,pageIndex,pageSize,object,memberId){
+    var flag="00";
+    var readOreye=$(".readOreye").get(0).selectedIndex;
+    var originId=$(object).children().eq(2).text();
+    $.ajax({
+        type: 'post',
+        url: '/pc/admin/official/getTaskPoolDto',
+        timeout:180000,
+        data: {officialAccountId:id, type:readOreye,pageIndex:pageIndex,pageSize:pageSize},
+        success: function (params) {
+            var json=eval(params);
+            if (json.errorCode == 0) {
+                if(json.data.total>pageSize){
+                    CreatePage(memberId,flag,pageIndex,pageSize,object,json.data.total);
+                }else {$(".PageCodeLi").css("display","none");}
+                if(json.data.total==0){
+                    oficialdetailcont(originId,"0");
+                }
+                json.data.list.forEach(function(e){
+                    oficialdetailcont(originId,e,readOreye);
+                });
+            }else if(json.errorCode==4){
+                alert(json.message);
+            }
+        }, error: function (data) {
+            alert("页面加载错误，请重试");
+        }
+    })
+}
 function userinforscoretitle(){
     $(".referlist").empty();
     var listlength=11;
@@ -248,13 +258,14 @@ function userinforscorecont(data){
     var input2=document.createElement('input');
     input2.setAttribute("type","button");input2.setAttribute("value","查询");
     div[10].setAttribute("onClick","javaScript:confirmUserInforSearch(this)");
+    div[2].setAttribute("title",data.nickName);div[5].setAttribute("title",data.address);
     div[9].appendChild(label);label.appendChild(input1);div[10].appendChild(input2);
-    document.getElementsByTagName("ul")[1].appendChild(li);
     if(data.isForbidden==0){
         $("#"+data.memberId+"").bootstrapSwitch('state', true);
     }else{
         $("#"+data.memberId+"").bootstrapSwitch('state', false);
     }
+    document.getElementsByTagName("ul")[1].appendChild(li);
 }
 function userScoreTitle(name){
     var listlength=6;
@@ -319,6 +330,7 @@ function userFlowContent(name,data){
         divcont[6] = ["col-xs-1", data.flowScore];divcont[7] = ["col-xs-1", data.isFinished];
     }
     var li=createElementList(div,listlength,divcont,"0");
+    div[1].setAttribute("title",data.typeDesc);
     document.getElementsByName(name)[0].insertBefore(li,PageCodeLi[0]);
 }
 function userContTitle(name){
@@ -331,7 +343,7 @@ function userContTitle(name){
         divcont[1] = ["col-xs-3", "任务类型"];divcont[2] = ["col-xs-4", "任务详情"];
         divcont[3] = ["col-xs-2", "任务米币"];divcont[4] = ["col-xs-3", "任务时间"];
     }else if(queryclassfun==4){
-        divcont[1] = ["col-xs-3", "用户名"];divcont[2] = ["col-xs-4", "公众号名称"];
+        divcont[1] = ["col-xs-3", "公众号Id"];divcont[2] = ["col-xs-4", "公众号名称"];
         divcont[3] = ["col-xs-2", "原始Id"];divcont[4] = ["col-xs-3", "创建时间"];
     }else if(queryclassfun==5){
         divcont[1] = ["col-xs-3", "用户名"];divcont[2] = ["col-xs-4", "被邀请人"];
@@ -375,6 +387,9 @@ function userContContent(name,data){
         }
     }
     var li=createElementList(div,listlength,divcont,"0");
+    if(queryclassfun==3){
+        div[1].setAttribute("title",data.taskDesc);
+    }
     document.getElementsByName(name)[0].insertBefore(li,PageCodeLi[0]);
 }
 function oficialtitle(name,data){
@@ -388,7 +403,7 @@ function oficialtitle(name,data){
         divcont[2] = ["col-xs-3", "---"];divcont[3] = ["col-xs-4", "---"];
         divcont[4] = ["col-xs-2", "---"];divcont[5] = ["col-xs-3", "---"];
     }else {
-        divcont[2] = ["col-xs-3", data.memberId];divcont[3] = ["col-xs-4", data.userName];
+        divcont[2] = ["col-xs-3", data.id];divcont[3] = ["col-xs-4", data.userName];
         divcont[4] = ["col-xs-2", data.originId];divcont[5] = ["col-xs-3", getLocalTime(data.createTime)];
     }
     var li=createElementList(div,listlength,divcont,"1");
@@ -416,22 +431,29 @@ function oficialdetailtitle(name){
     document.getElementsByName(name)[0].appendChild(li);
     document.getElementsByName(name)[0].appendChild(li1);
 }//公众号详细信息（二级）
-function oficialdetailcont(name){
+function oficialdetailcont(name,data,flag){
+    var PageCodeLi=document.getElementsByClassName("PageCodeLi");
     var listlength=7;
     var div=[];
     var divcont=new Array(); /*[i][0]:className, [i][1]:innerHTML, [i][2]:className*/
     divcont[0] = ["oficialcontbody col-xs-12"];
-    divcont[1] = ["col-xs-2", "关注公众号"];divcont[2] = ["col-xs-2"];divcont[3] = ["col-xs-1", "40"];
-    divcont[4] = ["col-xs-1", "500"];divcont[5] = ["col-xs-2", "2016-11-23 17:09"];
-    divcont[6] = ["col-xs-2", "24:56"];divcont[7] = ["col-xs-1", "50"];
+    if(flag==0){divcont[1] = ["col-xs-2","关注公众号"];}else{divcont[1] = ["col-xs-2","阅读文章"]}
+    divcont[2] = ["col-xs-2"];divcont[3] = ["col-xs-1",data.singleScore];
+    divcont[4] = ["col-xs-1",data.needNumber];divcont[5] = ["col-xs-2",getLocalTime(data.createTime)];
+    divcont[6] = ["col-xs-2",data.remainDays];divcont[7] = ["col-xs-1",data.remainNumber];
     var li=createElementList(div,listlength,divcont,"0");
     var label=document.createElement("label");var input1=document.createElement('input');
     input1.className="switchOn";input1.setAttribute("type","checkbox");input1.setAttribute("data-on-color","primary");
     input1.setAttribute("data-off-color","warning");input1.setAttribute("data-size","small");input1.setAttribute("data-on-text","开启");
-    input1.setAttribute("data-off-text","禁用");input1.setAttribute("id","task");
+    input1.setAttribute("data-off-text","禁用");input1.setAttribute("id",data.taskId);
     div[1].appendChild(label);label.appendChild(input1);
-    $("#task").bootstrapSwitch('state', true);
-    document.getElementsByName(name)[0].appendChild(li);
+    $("#"+data.taskId+"").bootstrapSwitch('state',true);
+    //if(data.isPublishNow==0){
+    //    $("#"+data.taskId+"").bootstrapSwitch('state',true);
+    //}else{
+    //    $("#"+data.taskId+"").bootstrapSwitch('state',false);
+    //}
+    document.getElementsByName(name)[0].insertBefore(li,PageCodeLi[0]);
 }
 
 function createElementList(div,length,cont,divbox){
@@ -472,8 +494,14 @@ function CreatePage(memberId,flag,pageIndex,pageSize,object,checkTotal){
         pageCount:pageCount,
         current:pageIndex,
         backFn:function(p){
-            $(object.parentNode).children().remove("li");
-            GetPageInfor(memberId,flag,p,pageSize,object);
+            if(flag=="00"){
+                $(object.parentNode).children(".oficialcontbody").remove();
+                var id=$(object).children().eq(0).text();
+                officialinforrequest(id,p,pageSize,object,memberId)
+            }else{
+                $(object.parentNode).children().remove("li");
+                GetPageInfor(memberId,flag,p,pageSize,object);
+            }
         }
     });
 }/*创建页码*/
@@ -518,8 +546,8 @@ function datepicker(){
     });
     $("#fixstarttime").attr("data-date",getNowStartDate());
     $("#fixendtime").attr("data-date",getNowEndDate());
-    $("#startime").attr("value","2016-9-30 8:00");
-    $("#endtime").attr("value","2016-11-01 12:00");
+    //$("#startime").attr("value","2016-9-30 8:00");
+    //$("#endtime").attr("value","2016-11-01 12:00");
 }
 //获取当前时间
 function getNowStartDate() {
