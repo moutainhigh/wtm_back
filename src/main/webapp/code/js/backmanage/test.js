@@ -34,7 +34,6 @@ function headSearch(){
     if(memberName==""){memberName=null}if(memberId==""){memberId=null}if(telephone==""){telephone=null}if(nickName==""){nickName=null}
     var obj=new UserInforCondi(memberName,nickName,telephone,memberId,registerStartTime,registerEndTime,pageIndex,pageSize);
     var requestObj = JSON.stringify(obj);
-    console.log(requestObj);
     userinforscoretitle();
     $(".refercont").remove();
     getMemberInformation(requestObj);
@@ -170,12 +169,23 @@ function getOfficialDetail(object){
     $(object.parentNode).siblings().children().remove("li");
     $(object.parentNode).siblings().children(".officialcount").attr("name","0");
     var memberId=$(object).children(":first").text();
+    var flag="00";
     if(clickCount==0){
         oficialdetailtitle(originId);
-        officialinforrequest(id,pageIndex,pageSize,object,memberId)
+        officialinforrequest(id,pageIndex,pageSize,object);
+        var oficialtotal=$(".readOreye").attr("name");
+        if(oficialtotal>pageSize){
+            CreatePage(memberId,flag,pageIndex,pageSize,object,oficialtotal);
+        }else {$(".PageCodeLi").css("display","none");}
         $(".readOreye").change(function(){
+            $(".PageCode").children().remove();
             $(".oficialcontbody").remove();
-            officialinforrequest(id,pageIndex,pageSize,object,memberId)
+            officialinforrequest(id,pageIndex,pageSize,object);
+            var oficialtotal=$(".readOreye").attr("name");
+            console.log(oficialtotal);
+            if(oficialtotal>pageSize){
+                CreatePage(memberId,flag,pageIndex,pageSize,object,oficialtotal);
+            }else {$(".PageCodeLi").css("display","none");}
         });
         object.setAttribute("name","1");
     }else{
@@ -183,21 +193,19 @@ function getOfficialDetail(object){
         $(object.parentNode).children().remove("li");
     }
 }//查询公众号信息请求
-function officialinforrequest(id,pageIndex,pageSize,object,memberId){
-    var flag="00";
+function officialinforrequest(id,pageIndex,pageSize,object,oficialtotal){
     var readOreye=$(".readOreye").get(0).selectedIndex;
     var originId=$(object).children().eq(2).text();
     $.ajax({
         type: 'post',
         url: '/pc/admin/official/getTaskPoolDto',
+        async:false,
         timeout:180000,
-        data: {officialAccountId:id, type:readOreye,pageIndex:pageIndex,pageSize:pageSize},
+        data: {officialAccountId:id,type:readOreye,pageIndex:pageIndex,pageSize:pageSize},
         success: function (params) {
             var json=eval(params);
             if (json.errorCode == 0) {
-                if(json.data.total>pageSize){
-                    CreatePage(memberId,flag,pageIndex,pageSize,object,json.data.total);
-                }else {$(".PageCodeLi").css("display","none");}
+                $(".readOreye").attr("name",json.data.total);
                 if(json.data.total==0){
                     oficialdetailcont(originId,"0");
                 }
@@ -228,7 +236,6 @@ function userinforscoretitle(){
     selectcont[0]=["查询内容"];selectcont[1]=["米币总数"];selectcont[2]=["米币流水"];selectcont[3]=["历史任务记录"];
     selectcont[4]=["公众号信息"];selectcont[5]=["邀请记录"];
     var li=createElementList(div,listlength,divcont,"0");//0：需要加载页码，1：不需要加载页码
-    console.log(li);
     var select=createElementSelect(option,selectlength,selectcont);
     select.setAttribute("id","queryclass");
     div[10].appendChild(select);
@@ -260,12 +267,12 @@ function userinforscorecont(data){
     div[10].setAttribute("onClick","javaScript:confirmUserInforSearch(this)");
     div[2].setAttribute("title",data.nickName);div[5].setAttribute("title",data.address);
     div[9].appendChild(label);label.appendChild(input1);div[10].appendChild(input2);
-    if(data.isForbidden==0){
-        $("#"+data.memberId+"").bootstrapSwitch('state', true);
-    }else{
-        $("#"+data.memberId+"").bootstrapSwitch('state', false);
-    }
     document.getElementsByTagName("ul")[1].appendChild(li);
+    if(data.isForbidden==0){
+        $("#"+data.memberId+"").bootstrapSwitch('state',true);
+    }else{
+        $("#"+data.memberId+"").bootstrapSwitch('state',false);
+    }
 }
 function userScoreTitle(name){
     var listlength=6;
@@ -437,25 +444,33 @@ function oficialdetailcont(name,data,flag){
     var div=[];
     var divcont=new Array(); /*[i][0]:className, [i][1]:innerHTML, [i][2]:className*/
     divcont[0] = ["oficialcontbody col-xs-12"];
-    if(flag==0){divcont[1] = ["col-xs-2","关注公众号"];}else{divcont[1] = ["col-xs-2","阅读文章"]}
-    divcont[2] = ["col-xs-2"];divcont[3] = ["col-xs-1",data.singleScore];
-    divcont[4] = ["col-xs-1",data.needNumber];divcont[5] = ["col-xs-2",getLocalTime(data.createTime)];
-    divcont[6] = ["col-xs-2",data.remainDays];divcont[7] = ["col-xs-1",data.remainNumber];
+    if(data=="0"){
+        divcont[1]=["col-xs-2","---"];
+        divcont[2] = ["col-xs-2", "---"];divcont[3] = ["col-xs-1", "---"];
+        divcont[4] = ["col-xs-1", "---"];divcont[5] = ["col-xs-2", "---"];
+        divcont[6] = ["col-xs-2", "---"];divcont[7] = ["col-xs-1", "---"];
+    }else {
+        if(flag==0){divcont[1] = ["col-xs-2","关注公众号"];} else{divcont[1] = ["col-xs-2",data.articleTitle]}
+        divcont[2] = ["col-xs-2"];divcont[3] = ["col-xs-1",data.singleScore];
+        divcont[4] = ["col-xs-1",data.needNumber];divcont[5] = ["col-xs-2",getLocalTime(data.createTime)];
+        divcont[6] = ["col-xs-2",data.remainDays];divcont[7] = ["col-xs-1",data.remainNumber];
+    }
     var li=createElementList(div,listlength,divcont,"0");
     var label=document.createElement("label");var input1=document.createElement('input');
     input1.className="switchOn";input1.setAttribute("type","checkbox");input1.setAttribute("data-on-color","primary");
-    input1.setAttribute("data-off-color","warning");input1.setAttribute("data-size","small");input1.setAttribute("data-on-text","开启");
-    input1.setAttribute("data-off-text","禁用");input1.setAttribute("id",data.taskId);
-    div[1].appendChild(label);label.appendChild(input1);
-    $("#"+data.taskId+"").bootstrapSwitch('state',true);
-    //if(data.isPublishNow==0){
-    //    $("#"+data.taskId+"").bootstrapSwitch('state',true);
-    //}else{
-    //    $("#"+data.taskId+"").bootstrapSwitch('state',false);
-    //}
+    input1.setAttribute("data-off-color","warning");input1.setAttribute("data-size","small");input1.setAttribute("data-on-text","已上线");
+    input1.setAttribute("data-off-text","已下线");input1.setAttribute("name",data.taskId);
+    if(data!="0"){
+        div[1].appendChild(label);label.appendChild(input1);
+        div[0].setAttribute("title",data.articleTitle);
+    }
     document.getElementsByName(name)[0].insertBefore(li,PageCodeLi[0]);
+    if(data.isPublishNow==0){
+        $("input[name="+data.taskId+"]").bootstrapSwitch('state',false);
+    }else{
+        $("input[name="+data.taskId+"]").bootstrapSwitch('state',true);
+    }
 }
-
 function createElementList(div,length,cont,divbox){
     var li=document.createElement('li');li.className=cont[0][0];
     if(cont[0][2]!=null&&cont[0][2]!=undefined){li.setAttribute("name",cont[0][2]);}
@@ -496,6 +511,7 @@ function CreatePage(memberId,flag,pageIndex,pageSize,object,checkTotal){
         backFn:function(p){
             if(flag=="00"){
                 $(object.parentNode).children(".oficialcontbody").remove();
+                console.log("当前页是第"+p+"页");
                 var id=$(object).children().eq(0).text();
                 officialinforrequest(id,p,pageSize,object,memberId)
             }else{

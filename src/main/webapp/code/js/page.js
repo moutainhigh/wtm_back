@@ -79,10 +79,12 @@
                 });
                 //涓婁竴椤�
                 obj.on("click","a.start",function(){
-                    var current =1;
+                    var current =parseInt("1");
                     ms.fillHtml(obj,{"current":1,"pageCount":args.pageCount});
                     if(typeof(args.backFn)=="function"){
-                        args.backFn(1);
+                        //console.log(typeof())
+                        args.backFn(current);
+                        //args[length-1].backFn(current);
                     }
                 });
                 obj.on("click","a.prevPage",function(){
@@ -127,4 +129,4 @@
         },options);
         ms.init(this,args);
     }
-})(jQuery)
+})(jQuery);
