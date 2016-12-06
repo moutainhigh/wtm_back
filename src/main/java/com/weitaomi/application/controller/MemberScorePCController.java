@@ -9,6 +9,7 @@ import com.weitaomi.systemconfig.dataFormat.AjaxResult;
 import com.weitaomi.systemconfig.exception.BusinessException;
 import com.weitaomi.systemconfig.exception.InfoException;
 import com.weitaomi.systemconfig.util.IpUtils;
+import com.weitaomi.systemconfig.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
@@ -48,14 +49,14 @@ public class MemberScorePCController extends BaseController{
         if (memberId==null){
             throw new BusinessException("用户ID为空");
         }
-        double realScore=score*(1+rate);
+        double realScore=score*(1+rate)*100;
         String table = "member:charge:underLine";
         String key = "member:indentifyCode:" + telephone;
         if (!keyValueService.valueIsExist(table,telephone)){
             throw new InfoException("操作人员不合法");
         }
         String identifyCodeBack=cacheService.getCacheByKey(key,String.class);
-        if (!identifyCodeBack.equals(identifyCode)){
+        if (StringUtil.isEmpty(identifyCodeBack)||!identifyCodeBack.equals(identifyCode)){
             throw new InfoException("验证码不正确");
         }
         return AjaxResult.getOK(memberScoreService.addMemberScore(memberId, typeId,1,realScore,sessionId));
