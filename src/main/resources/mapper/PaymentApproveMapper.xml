@@ -18,7 +18,7 @@
   </resultMap>
   <select id="getPaymentApproveList" resultType="com.weitaomi.application.model.bean.PaymentApprove">
 
-    select * from wtm_payment_approve a WHERE isPaid=0 ORDER BY a.createTime DESC
+    select * from wtm_payment_approve a WHERE isPaid=0 ORDER BY a.createTime ASC
 
   </select>
 </mapper>

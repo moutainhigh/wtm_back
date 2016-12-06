@@ -54,4 +54,17 @@ public class KeyValueService implements IKeyValueService{
         }
         return false;
     }
+    @Override
+    public boolean valueIsExist(String tableName, String idKey){
+        String mapValue=keyValueMapper.getValueBykey(tableName);
+        List<KeyValueDto> keyValueDtoList=JSONObject.parseArray(mapValue,KeyValueDto.class);
+        if (!keyValueDtoList.isEmpty()){
+            for (KeyValueDto keyValueDto:keyValueDtoList){
+                if (keyValueDto.getValue().equals(idKey)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

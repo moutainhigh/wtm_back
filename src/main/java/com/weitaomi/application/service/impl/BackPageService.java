@@ -8,17 +8,26 @@ import com.weitaomi.application.model.mapper.*;
 import com.weitaomi.application.service.interf.IBackPageService;
 import com.weitaomi.application.service.interf.IMemberTaskPoolService;
 import com.weitaomi.systemconfig.constant.SystemConfig;
+import com.weitaomi.systemconfig.exception.BusinessException;
 import com.weitaomi.systemconfig.exception.InfoException;
 import com.weitaomi.systemconfig.util.Page;
+import com.weitaomi.systemconfig.util.PropertiesUtil;
+import com.weitaomi.systemconfig.util.SendMCUtils;
+import com.weitaomi.systemconfig.util.StringUtil;
+import org.apache.ibatis.cache.CacheException;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.log4j.spi.LoggerFactory;
 import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Administrator on 2016/11/3.
@@ -40,6 +49,8 @@ public class BackPageService extends BaseService implements IBackPageService {
     private OfficalAccountMapper officalAccountMapper;
     @Autowired
     private MemberInvitedRecordMapper memberInvitedRecordMapper;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Override
     public Page<ArticleShowDto> getAllArticle(Integer pageIndex, Integer pageSize) {
@@ -47,7 +58,55 @@ public class BackPageService extends BaseService implements IBackPageService {
         PageInfo<Map<String, String>> showDtoPage = new PageInfo<Map<String, String>>(articleShowDtoList);
         return Page.trans(showDtoPage);
     }
-
+    @Override
+    public String sendIndentifyCode(String mobile, Integer type) {
+        if (!mobile.matches("^[1][34578]\\d{9}$")) {
+            throw new BusinessException("手机号码格式不正确");
+        }
+        String key = "member:indentifyCode:" + mobile;
+        String value = this.getIndentifyCodeFromCache(key);
+        if (value != null && !value.equals("00000000")) {
+            throw new InfoException("验证码已发送，请120s后重试");
+        }
+        String identifyCode = StringUtil.numRandom(6);
+        String content = null;
+        content = MessageFormat.format(new String(PropertiesUtil.getValue("verifycode.msg")), identifyCode);
+        SendMCUtils.sendMessage(mobile, content);
+        this.setIndentifyCodeToCache(key, identifyCode, 120L);
+        return identifyCode;
+    }
+    /**
+     * 获取缓存
+     *
+     * @param key
+     * @return
+     */
+    private String getIndentifyCodeFromCache(String key) {
+        ValueOperations<String, String> valueOper = redisTemplate.opsForValue();
+        StringBuilder sb = new StringBuilder();
+        String type = null;
+        String value = valueOper.get(key);
+        if (value != null) {
+            return value;
+        }
+        return "00000000";
+    }
+    /**
+     * 设置缓存
+     *
+     * @param key
+     * @param IdentifyCode
+     * @param timeout
+     * @throws CacheException
+     */
+    private void setIndentifyCodeToCache(String key, String IdentifyCode, Long timeout) {
+        Long timeoutTemp = timeout;
+        if (timeout == null) {
+            timeoutTemp = 120L;
+        }
+        ValueOperations<String, String> valueOper = redisTemplate.opsForValue();
+        valueOper.set(key, IdentifyCode, timeoutTemp, TimeUnit.SECONDS);
+    }
     @Override
     public int patchCheckArticle(List<Long> poolIdList) {
         if (!poolIdList.isEmpty()){

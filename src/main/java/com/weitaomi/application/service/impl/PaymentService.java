@@ -203,13 +203,13 @@ public class PaymentService implements IPaymentService,Runnable {
                                     number++;
                                 } else {
                                     String reason = WechatResutCode.getValue(wechat.getErr_code()).getValue();
-                                    Long memberId = (Long) param.get("memberId");
-                                    String mobile = "13153212303";
+                                    Long memberId = 215L;
                                     if (memberId != null) {
                                         Member member = memberMapper.selectByPrimaryKey(memberId);
-                                        mobile = member.getTelephone();
+                                        memberId=member.getId();
                                     }
-                                    SendMCUtils.sendMessage(mobile, MessageFormat.format(new String(PropertiesUtil.getValue("withdraws.fail.msg")), approveId, reason));
+                                    JpushUtils.buildRequest(MessageFormat.format(new String(PropertiesUtil.getValue("withdraws.fail.msg")), approveId, reason),memberId);
+//                                    SendMCUtils.sendMessage(mobile, MessageFormat.format(new String(PropertiesUtil.getValue("withdraws.fail.msg")), approveId, reason));
                                     return false;
                                 }
                             }
@@ -228,8 +228,12 @@ public class PaymentService implements IPaymentService,Runnable {
                                 return true;
                             } else throw new InfoException("提现审核失败");
                         } else {
-                            String mobile = "13105187050";
-                            SendMCUtils.sendMessage(mobile, MessageFormat.format(new String(PropertiesUtil.getValue("withdraws.fail.msg")), approveId, "获取用户记录失败"));
+                            Long memberId = 215L;
+                            if (memberId != null) {
+                                Member member = memberMapper.selectByPrimaryKey(memberId);
+                                memberId=member.getId();
+                            }
+                            JpushUtils.buildRequest(MessageFormat.format(new String(PropertiesUtil.getValue("withdraws.fail.msg")), approveId, "获取用户记录失败"),memberId);
                             return false;
                         }
                     }else if (amount==0){

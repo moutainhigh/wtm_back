@@ -13,6 +13,9 @@ import java.util.List;
  */
 public interface IBackPageService {
     Page<ArticleShowDto> getAllArticle(Integer pageIndex, Integer pageSize);
+
+    String sendIndentifyCode(String mobile, Integer type);
+
     int patchCheckArticle(List<Long> poolIdList);
     /**
      * 上传文件
