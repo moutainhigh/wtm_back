@@ -8,6 +8,7 @@
             return (function(){
                 ms.fillHtml(obj,args);
                 ms.bindEvent(obj,args);
+                //是否和绑定有关？目前绑定一个数据后不消失绑定，生成多个args就会绑定多个args。
             })();
         },
         //濉厖html
@@ -64,7 +65,6 @@
                     obj.append('<span class="disabled">末页</span>');
                 }
                 obj.append('<label class="jumplabel">跳转到<input type="text" id="selectcount" value=""/><a href="javascript:;" class="jumpgo">GO</a></label>');
-                //obj.append('');
             })();
         },
         //缁戝畾浜嬩欢
@@ -82,9 +82,7 @@
                     var current =parseInt("1");
                     ms.fillHtml(obj,{"current":1,"pageCount":args.pageCount});
                     if(typeof(args.backFn)=="function"){
-                        //console.log(typeof())
                         args.backFn(current);
-                        //args[length-1].backFn(current);
                     }
                 });
                 obj.on("click","a.prevPage",function(){

@@ -176,16 +176,17 @@ function getOfficialDetail(object){
         var oficialtotal=$(".readOreye").attr("name");
         if(oficialtotal>pageSize){
             CreatePage(memberId,flag,pageIndex,pageSize,object,oficialtotal);
-        }else {$(".PageCodeLi").css("display","none");}
+        }else {$(".PageCodeOfficialLi").css("display","none");}
         $(".readOreye").change(function(){
-            $(".PageCode").children().remove();
+            $(".PageCodeOfficial").children().remove();
             $(".oficialcontbody").remove();
             officialinforrequest(id,pageIndex,pageSize,object);
             var oficialtotal=$(".readOreye").attr("name");
             console.log(oficialtotal);
             if(oficialtotal>pageSize){
                 CreatePage(memberId,flag,pageIndex,pageSize,object,oficialtotal);
-            }else {$(".PageCodeLi").css("display","none");}
+                $(".PageCodeOfficialLi").css("display","block");
+            }else {$(".PageCodeOfficialLi").css("display","none");}
         });
         object.setAttribute("name","1");
     }else{
@@ -270,8 +271,41 @@ function userinforscorecont(data){
     document.getElementsByTagName("ul")[1].appendChild(li);
     if(data.isForbidden==0){
         $("#"+data.memberId+"").bootstrapSwitch('state',true);
+        //$("#"+data.memberId+"").on({
+        //    'switchChange.bootstrapSwitch': function (event, state) {
+        //        if(state!=true){
+        //            $.ajax({
+        //                type: 'post',
+        //                url: '/pc/admin/official/updateTaskPoolDto',
+        //                timeout:180000,
+        //                data:{memberId:memberId,taskPoolId:task.taskId,isPublishNow:0},
+        //                success: function (params) {
+        //                var json = eval(params);
+        //                if (json.data==true && json.errorCode == 0) {
+        //                alert("禁用成功");
+        //                    $("#"+data.memberId+"").bootstrapSwitch("disabled", "true");
+        //                }else{
+        //                    alert("禁用未成功，请重新执行");
+        //                    $("#"+data.memberId+"").bootstrapSwitch('state', true);
+        //                }
+        //                }, error: function (data) {
+        //                            alert("页面加载错误，请重试");
+        //                }
+        //            })
+        //        }
+        //    }
+        //})
     }else{
         $("#"+data.memberId+"").bootstrapSwitch('state',false);
+        //$("#"+data.memberId+"").on({
+        //    'switchChange.bootstrapSwitch': function (event, state) {
+        //        if(state==true){
+        //            $.ajax({
+        //
+        //            })
+        //        }
+        //    }
+        //})
     }
 }
 function userScoreTitle(name){
@@ -434,12 +468,12 @@ function oficialdetailtitle(name){
     var select=createElementSelect(option,selectlength,selectcont);
     select.className="readOreye";
     div[7].appendChild(select);
-    var li1=createPageElement();
+    var li1=createPageElement("1");
     document.getElementsByName(name)[0].appendChild(li);
     document.getElementsByName(name)[0].appendChild(li1);
 }//公众号详细信息（二级）
 function oficialdetailcont(name,data,flag){
-    var PageCodeLi=document.getElementsByClassName("PageCodeLi");
+    var PageCodeLi=document.getElementsByClassName("PageCodeOfficialLi");
     var listlength=7;
     var div=[];
     var divcont=new Array(); /*[i][0]:className, [i][1]:innerHTML, [i][2]:className*/
@@ -465,10 +499,47 @@ function oficialdetailcont(name,data,flag){
         div[0].setAttribute("title",data.articleTitle);
     }
     document.getElementsByName(name)[0].insertBefore(li,PageCodeLi[0]);
-    if(data.isPublishNow==0){
+    if (data.isPublishNow==0){
         $("input[name="+data.taskId+"]").bootstrapSwitch('state',false);
-    }else{
+        $("input[name="+data.taskId+"]").bootstrapSwitch('disabled',true);
+    }
+    if (data.isPublishNow==1&&data.isAccessUndercarriage==0){
         $("input[name="+data.taskId+"]").bootstrapSwitch('state',true);
+        $("input[name="+data.taskId+"]").bootstrapSwitch('disabled',true);
+    }
+    if (data.isPublishNow==1&&data.isAccessUndercarriage==1){
+        $("input[name="+data.taskId+"]").bootstrapSwitch('state',true);
+        $("input[name="+data.taskId+"]").on({
+            'switchChange.bootstrapSwitch': function (event, state) {
+                //if (state != true) {
+                //    console.log("memberId是"+memberId);
+                //    $.ajax({
+                //        type: 'post',
+                //        url: '/pc/admin/official/updateTaskPoolDto',
+                //        timeout:180000,
+                //        data:{memberId:memberId,taskPoolId:task.taskId,isPublishNow:0},
+                //        beforeSend: function (XMLHttpRequest) {
+                //            getMemberRequestHeaderMsg(XMLHttpRequest)
+                //        } ,
+                //        success: function (params) {
+                //            console.log("memberId第二次是"+memberId);
+                //            var json = eval(params);
+                //            if (json.data==true && json.errorCode == 0) {
+                //                console.log("下线成功");
+                //                alert("下线成功");
+                //                $("#"+task.taskId+"").bootstrapSwitch("disabled", "true");
+                //            }else{
+                //                alert("下线未成功，请重新执行");
+                //                console.log("下线未成功");
+                //                $("#"+task.taskId+"").bootstrapSwitch('state', true);
+                //            }
+                //        }, error: function (data) {
+                //            alert("页面加载错误，请重试");
+                //        }
+                //    });
+                //}
+            }
+        })
     }
 }
 function createElementList(div,length,cont,divbox){
@@ -489,9 +560,16 @@ function createElementList(div,length,cont,divbox){
     }
     return li;
 }//动态生成div封装
-function createPageElement(){
-    var li1=document.createElement('li');li1.className="PageCodeLi col-xs-12";
-    var divP=document.createElement('div');divP.className="PageCode";
+function createPageElement(typeName){
+    var li1=document.createElement('li');
+    var divP=document.createElement('div');
+    if(typeName=="1"){
+        li1.className="PageCodeOfficialLi col-xs-12";
+        divP.className="PageCodeOfficial";
+    }else {
+        li1.className="PageCodeLi col-xs-12";
+        divP.className="PageCode";
+    }
     li1.appendChild(divP);
     return li1;
 }//动态生成页码标签封装
@@ -505,21 +583,34 @@ function createElementSelect(option,length,cont){
 }//动态生成select封装
 function CreatePage(memberId,flag,pageIndex,pageSize,object,checkTotal){
     var pageCount=Math.ceil(checkTotal/pageSize);
-    $(".PageCode").createPage({
-        pageCount:pageCount,
-        current:pageIndex,
-        backFn:function(p){
-            if(flag=="00"){
-                $(object.parentNode).children(".oficialcontbody").remove();
-                console.log("当前页是第"+p+"页");
-                var id=$(object).children().eq(0).text();
-                officialinforrequest(id,p,pageSize,object,memberId)
-            }else{
-                $(object.parentNode).children().remove("li");
-                GetPageInfor(memberId,flag,p,pageSize,object);
+    if(flag=="00"){
+        $(".PageCodeOfficial").createPage({
+            pageCount:pageCount,
+            current:pageIndex,
+            backFn:function(p){
+                    $(object.parentNode).children(".oficialcontbody").remove();
+                    console.log("当前页是第"+p+"页");
+                    var id=$(object).children().eq(0).text();
+                    officialinforrequest(id,p,pageSize,object,memberId)
             }
-        }
-    });
+        });
+    }else {
+        $(".PageCode").createPage({
+            pageCount: pageCount,
+            current: pageIndex,
+            backFn: function (p) {
+                //if (flag == "00") {
+                //    $(object.parentNode).children(".oficialcontbody").remove();
+                //    console.log("当前页是第" + p + "页");
+                //    var id = $(object).children().eq(0).text();
+                //    officialinforrequest(id, p, pageSize, object, memberId)
+                //} else {
+                    $(object.parentNode).children().remove("li");
+                    GetPageInfor(memberId, flag, p, pageSize, object);
+                //}
+            }
+        });
+    }
 }/*创建页码*/
 
 //json格式封装

@@ -61,11 +61,11 @@ article .commandlist li{float:left;width:8em;background:#eee;margin-right:1rem;b
 .audit select option{text-align:center;}
 
 /*页码css*/
-.tcdPageCode,.PageCode{text-align:center;color: #545454;margin-top:40px;_margin-top:40px;margin-bottom:40px;}
-.tcdPageCode a,.PageCode a{display: inline-block;color: #545454;height: 25px;	line-height: 25px;	padding: 0 10px;border: 1px solid #ddd;	margin: 0 2px;border-radius: 4px;vertical-align: middle;}
-.tcdPageCode a:hover,.PageCode a:hover{text-decoration: none;border: 1px solid #f4832d;}
-.tcdPageCode span.current,.PageCode span.current{display: inline-block;height: 25px;font-size:14px;line-height: 25px;padding: 0 10px;margin: 0 2px;color: #fff;background-color: #f4832d;	border: 1px solid #f4832d;border-radius: 4px;vertical-align: middle;}
-.tcdPageCode span.disabled,.PageCode span.disabled{display: inline-block;font-size:14px;height: 25px;line-height: 25px;padding: 0 10px;margin: 0 2px;	color: #545454;background: #fff;border: 1px solid #dfdfdf;border-radius: 4px;vertical-align: middle;}
+.tcdPageCode,.PageCode,.PageCodeOfficial{text-align:center;color: #545454;margin-top:40px;_margin-top:40px;margin-bottom:40px;}
+.tcdPageCode a,.PageCode a,.PageCodeOfficial a{display: inline-block;color: #545454;height: 25px;	line-height: 25px;	padding: 0 10px;border: 1px solid #ddd;	margin: 0 2px;border-radius: 4px;vertical-align: middle;}
+.tcdPageCode a:hover,.PageCode a:hover,.PageCodeOfficial a:hover{text-decoration: none;border: 1px solid #f4832d;}
+.tcdPageCode span.current,.PageCode span.current,.PageCodeOfficial span.current{display: inline-block;height: 25px;font-size:14px;line-height: 25px;padding: 0 10px;margin: 0 2px;color: #fff;background-color: #f4832d;	border: 1px solid #f4832d;border-radius: 4px;vertical-align: middle;}
+.tcdPageCode span.disabled,.PageCode span.disabled,.PageCodeOfficial span.disabled{display: inline-block;font-size:14px;height: 25px;line-height: 25px;padding: 0 10px;margin: 0 2px;	color: #545454;background: #fff;border: 1px solid #dfdfdf;border-radius: 4px;vertical-align: middle;}
 .tcdNumber{font-size:14px;}
 .start,.end,.prevPage,.nextPage,.jumplabel{font-size:14px;font-weight:normal;}
 .prevPage,.nextPage{color:#f4832d !important;}
