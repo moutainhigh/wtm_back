@@ -10,24 +10,24 @@
     <mvc:annotation-driven/>
     <context:property-placeholder location="classpath:server.properties"/>
     <!-- 定义监听接口 -->
-    <!--<bean id="addOfficialAccountListener" class="com.weitaomi.systemconfig.listener.AddOfficialAccountListener"/>-->
-    <!--<bean id="withdrawPageListener" class="com.weitaomi.systemconfig.listener.WithdrawPageListener"/>-->
-    <!--<bean id="messageConverter" class="com.weitaomi.systemconfig.listener.Gson2JsonMessageConverter"/>-->
-    <!--<rabbit:connection-factory id="connectionFactory" host="${rabbit.host}" port="${rabbit.port}"-->
-                               <!--username="${rabbit.username}" password="${rabbit.password}"/>-->
-    <!--<rabbit:template id="rabbitTemplate" connection-factory="connectionFactory" exchange="add_topic_exchage"-->
-                     <!--message-converter="messageConverter"/>-->
-    <!--<rabbit:admin connection-factory="connectionFactory" auto-startup="true"/>-->
-    <!--<rabbit:queue name="addOfficialAccountQueue" durable="true" auto-delete="false" exclusive="false"/>-->
-    <!--<rabbit:queue name="dealWithdrawsChangeQueue" durable="true" auto-delete="false" exclusive="false"/>-->
-    <!--<rabbit:topic-exchange name="add_topic_exchage">-->
-        <!--<rabbit:bindings>-->
-            <!--<rabbit:binding pattern="addOfficialAccount.#" queue="addOfficialAccountQueue"/>-->
-            <!--<rabbit:binding pattern="dealWithdrawsChange.#" queue="dealWithdrawsChangeQueue"/>-->
-        <!--</rabbit:bindings>-->
-    <!--</rabbit:topic-exchange>-->
-    <!--<rabbit:listener-container connection-factory="connectionFactory" acknowledge="manual" concurrency="10">-->
-        <!--<rabbit:listener ref="addOfficialAccountListener" queues="addOfficialAccountQueue"/>-->
-        <!--<rabbit:listener ref="withdrawPageListener" queues="dealWithdrawsChangeQueue"/>-->
-    <!--</rabbit:listener-container>-->
+    <bean id="addOfficialAccountListener" class="com.weitaomi.systemconfig.listener.AddOfficialAccountListener"/>
+    <bean id="withdrawPageListener" class="com.weitaomi.systemconfig.listener.WithdrawPageListener"/>
+    <bean id="messageConverter" class="com.weitaomi.systemconfig.listener.Gson2JsonMessageConverter"/>
+    <rabbit:connection-factory id="connectionFactory" host="${rabbit.host}" port="${rabbit.port}"
+                               username="${rabbit.username}" password="${rabbit.password}"/>
+    <rabbit:template id="rabbitTemplate" connection-factory="connectionFactory" exchange="add_topic_exchage"
+                     message-converter="messageConverter"/>
+    <rabbit:admin connection-factory="connectionFactory" auto-startup="true"/>
+    <rabbit:queue name="addOfficialAccountQueue" durable="true" auto-delete="false" exclusive="false"/>
+    <rabbit:queue name="dealWithdrawsChangeQueue" durable="true" auto-delete="false" exclusive="false"/>
+    <rabbit:topic-exchange name="add_topic_exchage">
+        <rabbit:bindings>
+            <rabbit:binding pattern="addOfficialAccount.#" queue="addOfficialAccountQueue"/>
+            <rabbit:binding pattern="dealWithdrawsChange.#" queue="dealWithdrawsChangeQueue"/>
+        </rabbit:bindings>
+    </rabbit:topic-exchange>
+    <rabbit:listener-container connection-factory="connectionFactory" acknowledge="manual" concurrency="10">
+        <rabbit:listener ref="addOfficialAccountListener" queues="addOfficialAccountQueue"/>
+        <rabbit:listener ref="withdrawPageListener" queues="dealWithdrawsChangeQueue"/>
+    </rabbit:listener-container>
 </beans>
