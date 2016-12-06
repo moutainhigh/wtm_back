@@ -18,7 +18,7 @@ function sendVerifyCode(){
             type: 'post',
             url: '/pc/admin/memberScore/sendIdentifyCode',
             timeout:180000,
-            data: {mobile:1},
+            data: {mobile:telephone},
             success: function (params) {
                 var data=eval(params);
                 var errorCode=data.errorCode
