@@ -90,7 +90,8 @@ function buttondata(sessionId){
         var memberId=$("#memberId").val();
         var score=$("#cleckmoney").attr("name");
         var rate=$("#percent").val()/100;
-        if(rate<=0||rate>1){
+        console.log(rate);
+        if(rate<0||rate>1){
             alert("加成比例不正确，请重新输入")
         }
         $.ajax({
@@ -103,8 +104,8 @@ function buttondata(sessionId){
                 if (json.data!=null&&json.errorCode==0){
                     alert("充值成功");
                     location.reload();
-                } else if (son.errorCode==4){
-                    alert(data.message)
+                } else{
+                    alert(json.message)
                 }
             },error:function(){
                 alert("页面加载失败，请重新加载")
