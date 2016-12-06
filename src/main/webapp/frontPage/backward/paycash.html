@@ -22,9 +22,37 @@
         <div class="paddingboder">
             <div class="payhead">会员充值中心</div>
             <div class="paymoney">
-                <h5>充值金额：</h5>
-                <input id="cleckmoney" type="number" value="" placeholder="请输入金额（>=50）"/>
+                <div id="telverify">
+                    <h5>手机号：</h5>
+                    <div id="telbox">
+                        <input type="number" name="telephone" id="telephone" value="" placeholder="请输入手机号">
+                        <div id="sendVerifyCode" >发送验证码</div>
+                        <div id="downtime"></div>
+                    </div>
+                </div>
+                <div id="telcode">
+                    <h5>验证码：</h5>
+                    <input type="number" name="identifyCode" id="identifyCode" class="code" value="" placeholder="请输入验证码">
+                </div>
+            </div>
+            <div class="paymoney">
+                <label>
+                    <h5><span>用</span>用户Id：</h5>
+                    <input id="memberId" type="text" value="" placeholder="请输入用户Id"/>
+                </label>
+                <label>
+                    <h5>充值金额：</h5>
+                    <input id="cleckmoney" type="number" value="" placeholder="请输入金额（>=50）"/>
+                </label>
+                <label>
+                    <h5>加成比例：</h5>
+                    <p class="percentbox">
+                        <input id="percent" type="number" value=""/>
+                        %
+                    </p>
+                </label>
                 <ul class="moneylist">
+                    <h5>选择金额：</h5>
                     <li><span>50</span>元</li>
                     <li><span>100</span>元</li>
                     <li><span>200</span>元</li>
@@ -34,9 +62,12 @@
                     <li class="margin0"><span>2000</span>元</li>
                 </ul>
             </div>
-        </div>
+            <input type="button" value="提交" id="button">
         </div>
     </article>
 </div>
+<script src="../../code/js/backmanage/backcommon.js"></script>
+<script src="../../code/js/backmanage/paycash.js"></script>
+<script type="text/javascript" src="../../code/js/time_js.js"></script>
 </body>
 </html>
