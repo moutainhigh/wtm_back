@@ -12,6 +12,9 @@
     <result column="isFinished" jdbcType="INTEGER" property="isFinished" />
     <result column="memberScoreBefore" jdbcType="DECIMAL" property="memberScoreBefore" />
     <result column="memberScoreAfter" jdbcType="DECIMAL" property="memberScoreAfter" />
+    <result column="avaliableScoreBefore" jdbcType="DECIMAL" property="avaliableScoreBefore" />
+    <result column="avaliableScoreAfter" jdbcType="DECIMAL" property="avaliableScoreAfter" />
+    <result column="avaliableScoreBefore" jdbcType="DECIMAL" property="avaliableScoreBefore" />
     <result column="flowScore" jdbcType="DECIMAL" property="flowScore" />
     <result column="createTime" jdbcType="BIGINT" property="createTime" />
   </resultMap>

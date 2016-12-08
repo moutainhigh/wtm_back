@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.ChannelAwareMessageListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.List;
 import java.util.Map;
@@ -24,17 +25,24 @@ public class AddOfficialAccountListener implements ChannelAwareMessageListener {
     private IOfficeAccountService officeAccountService;
     @Autowired
     private Gson2JsonMessageConverter messageConverter;
+    @Autowired
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
     @Override
     public void onMessage(Message message, Channel channel) throws Exception {
         channel.basicQos(100);
         String data=(String)messageConverter.fromMessage(message);
         Map params=(Map)JSONObject.parse(data);
-        List<Long> idList=(List<Long>)params.get("idList");
-        String unionId=(String)params.get("unionId");
+        final List<Long> idList=(List<Long>)params.get("idList");
+        final String unionId=(String)params.get("unionId");
         logger.info("获取数据成功：{}", JSON.toJSONString(params));
         channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
         if (idList!=null&& !StringUtil.isEmpty(unionId)){
-            officeAccountService.sendRequestToWechatDialog(unionId,idList);
+            threadPoolTaskExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    officeAccountService.sendRequestToWechatDialog(unionId,idList);
+                }
+            });
         }
     }
 }

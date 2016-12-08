@@ -79,12 +79,14 @@ public class MemberScoreService implements IMemberScoreService {
                     }
                     BigDecimal increaseScore = null;
                     BigDecimal scoreBefore = BigDecimal.ZERO;
+                    BigDecimal avaliableScoreBefore=BigDecimal.ZERO;
+                    BigDecimal avaliableScoreFlow=BigDecimal.ZERO;
                     MemberScore memberScore = memberScoreMapper.getMemberScoreByMemberId(memberId);
                     if (score != null) {
                         BigDecimal rate = BigDecimal.ONE;
                         increaseScore = BigDecimal.valueOf(score).multiply(rate);
                     }
-
+                    MemberScoreFlow memberScoreFlow = new MemberScoreFlow();
                     if (memberScore == null) {
                         if (increaseScore.doubleValue() < 0) {
                             throw new BusinessException("可用积分不足");
@@ -118,6 +120,7 @@ public class MemberScoreService implements IMemberScoreService {
                         BigDecimal afterScore = scoreBefore.add(increaseScore);
                         //可用米币
                         BigDecimal avaliableScore=memberScore.getAvaliableScore();
+                        avaliableScoreBefore=avaliableScore;
                         //充值米币（current）
                         BigDecimal rechargeCurrentScore=memberScore.getRechargeCurrentScore();
                         //充值米币（total）
@@ -128,6 +131,7 @@ public class MemberScoreService implements IMemberScoreService {
                         }
                         if (flag) {
                             avaliableScore = avaliableScore.add(increaseScore);
+                            avaliableScoreFlow=increaseScore;
                             if (typeId==1) {
                                 rechargeTotalScore = rechargeTotalScore.add(increaseScore);
                                 rechargeCurrentScore = rechargeCurrentScore.add(increaseScore);
@@ -142,25 +146,30 @@ public class MemberScoreService implements IMemberScoreService {
                         if (afterScore.doubleValue() < 0) {
                             throw new BusinessException("可用积分不足");
                         }
-                        if (typeId!=17&&typeId!=16) {
+                        String memberScoreKey="member:score:type:isMemberScore";
+                        boolean memberScoreAvaliable= cacheService.keyExistInHashTable(memberScoreKey,typeId.toString());
+                        if (!memberScoreAvaliable){
+                            memberScoreAvaliable=keyValueService.keyIsExist(memberScoreKey,typeId.toString());
+                        }
+                        if (memberScoreAvaliable) {
                             memberScore.setMemberScore(afterScore);
                         }
-                        if (typeId!=8) {
-                            memberScore.setAvaliableScore(avaliableScore);
-                        }
+                        memberScore.setAvaliableScore(avaliableScore);
                         memberScore.setRechargeCurrentScore(rechargeCurrentScore);
                         memberScore.setRechargeTotalScore(rechargeTotalScore);
                         memberScore.setRate(BigDecimal.ONE);
                         memberScore.setUpdateTime(DateUtils.getUnixTimestamp());
                         memberScoreMapper.updateByPrimaryKeySelective(memberScore);
                     }
-                    MemberScoreFlow memberScoreFlow = new MemberScoreFlow();
                     memberScoreFlow.setMemberId(memberId);
                     memberScoreFlow.setTypeId(typeId);
                     memberScoreFlow.setIsFinished(isFinished);
                     memberScoreFlow.setFlowScore(increaseScore);
                     memberScoreFlow.setMemberScoreAfter(memberScore.getMemberScore());
                     memberScoreFlow.setMemberScoreBefore(scoreBefore);
+                    memberScoreFlow.setAvaliableScoreBefore(avaliableScoreBefore);
+                    memberScoreFlow.setAvaliableScoreAfter(memberScore.getAvaliableScore());
+                    memberScoreFlow.setAvaliableFlowScore(avaliableScoreFlow);
                     memberScoreFlow.setMemberScoreId(memberScore.getId());
                     memberScoreFlow.setCreateTime(DateUtils.getUnixTimestamp());
                     Boolean flag = memberScoreFlowMapper.insertSelective(memberScoreFlow) > 0 ? true : false;

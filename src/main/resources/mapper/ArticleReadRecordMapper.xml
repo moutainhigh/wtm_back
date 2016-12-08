@@ -18,7 +18,7 @@
     </foreach>
   </insert>
   <select id="getArticleReadRecordDto" resultType="com.weitaomi.application.model.dto.ArticleReadRecordDto">
-    select a.id articleId,a.title title,a.articleAbstract articleAbstract,a.url articleUrl,a.imageUrl imageUrl,p.singleScore*p.rate singleScore,a.createTime createTime from wtm_article_read_record r
+    select a.id articleId,a.title title,a.articleAbstract articleAbstract,a.url articleUrl,a.imageUrl imageUrl,p.finishScore,a.createTime createTime from wtm_article_read_record r
     LEFT JOIN wtm_article a ON a.id=r.articleId LEFT JOIN wtm_task_pool p ON p.articleId=a.id
           WHERE r.memberId=#{memberId} AND r.createTime=#{createTime} AND p.id>0 AND r.type=0
   </select>

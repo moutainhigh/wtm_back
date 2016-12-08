@@ -2,7 +2,9 @@ package com.weitaomi.application.model.bean;
 
 import com.weitaomi.application.model.BaseModel;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.math.BigDecimal;
 
 @Table(name = "wtm_task_pool")
@@ -48,7 +50,11 @@ public class TaskPool extends BaseModel {
      */
     @Column(name = "singleScore")
     private Double singleScore;
-
+    /**
+     * 完成奖励
+     */
+    @Column(name = "finishScore")
+    private Double finishScore;
     /**
      * 请求群体性别
      */
@@ -84,7 +90,7 @@ public class TaskPool extends BaseModel {
     @Column(name = "needNumber")
     private Integer needNumber;
     /**
-     * 实际数量
+     * 实际增长数
      */
     @Column(name = "realityNumber")
     private Integer realityNumber;
@@ -353,18 +359,34 @@ public class TaskPool extends BaseModel {
     }
 
     /**
-     * 获取实际数量
-     * @return realityNumber 实际数量
+     * 获取实际增长数
+     * @return realityNumber 实际增长数
      */
     public Integer getRealityNumber() {
         return this.realityNumber;
     }
 
     /**
-     * 设置实际数量
-     * @param realityNumber 实际数量
+     * 设置实际增长数
+     * @param realityNumber 实际增长数
      */
     public void setRealityNumber(Integer realityNumber) {
         this.realityNumber = realityNumber;
+    }
+
+    /**
+     * 获取完成奖励
+     * @return finishScore 完成奖励
+     */
+    public Double getFinishScore() {
+        return this.finishScore;
+    }
+
+    /**
+     * 设置完成奖励
+     * @param finishScore 完成奖励
+     */
+    public void setFinishScore(Double finishScore) {
+        this.finishScore = finishScore;
     }
 }
